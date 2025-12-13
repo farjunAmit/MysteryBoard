@@ -79,7 +79,11 @@ function AdminHome() {
             <ScenarioForm
               onCancel={() => setShowCreateForm(false)}
               onCreated={(payload) => {
-                console.log("Scenario created in parent:", payload);
+                const scenarioWithId = {
+                  ...payload,
+                  id: Date.now(),
+                };
+                setScenarios((prev) => [...prev, payload]);
                 setShowCreateForm(false);
               }}
             />
