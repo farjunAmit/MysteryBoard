@@ -14,6 +14,8 @@ export default function ScenarioForm({ onCancel, onCreated }) {
 
     // Reset any previous error
     setError(null);
+    const min = Number(minPlayers);
+    const max = Number(maxPlayers);
 
     // Validation: Name is required
     if (!name.trim()) {
@@ -22,25 +24,24 @@ export default function ScenarioForm({ onCancel, onCreated }) {
     }
 
     // Validation: Minimum players required
-    if (!minPlayers) {
+    if (!min) {
       setError("יש להזין מינימום שחקנים");
       return;
     }
 
     // Validation: Maximum players required
-    if (!maxPlayers) {
+    if (!max) {
       setError("יש להזין מקסימום שחקנים");
       return;
     }
 
     // Optional: ensure min <= max
-    if (Number(minPlayers) > Number(maxPlayers)) {
+    if (min > max) {
       setError("מינימום שחקנים לא יכול להיות גדול מהמקסימום");
       return;
     }
 
-    const max = Number(maxPlayers);
-    if (!max || characters.length !== max) {
+    if (characters.length !== max) {
       setError("כמות הדמויות חייבת להיות זהה למספר השחקנים המקסימאלי");
       return;
     }
@@ -49,8 +50,8 @@ export default function ScenarioForm({ onCancel, onCreated }) {
     const payload = {
       name: name.trim(),
       description: description.trim() || null,
-      minPlayers: Number(minPlayers),
-      maxPlayers: Number(maxPlayers),
+      minPlayers: min,
+      maxPlayers: max,
       characters,
     };
 
@@ -59,6 +60,11 @@ export default function ScenarioForm({ onCancel, onCreated }) {
     if (onCreated) {
       onCreated(payload);
     }
+  }
+
+  function handleRemoveCharacter(id) {
+    setCharacters((prev) => prev.filter((c) => c.id !== id));
+    setError(null)
   }
 
   return (
@@ -136,12 +142,17 @@ export default function ScenarioForm({ onCancel, onCreated }) {
         </div>
       </div>
 
-      <CharacterForm onAdd={(char) => setCharacters([...characters, char])} />
+      <CharacterForm
+        onAdd={(char) => setCharacters((prev) => [...prev, char])}
+      />
 
       <ul>
         {characters.map((c) => (
           <li key={c.id}>
             {c.name} {c.required ? "(חובה)" : ""} - {c.traits.join(", ")}
+            <button type="button" onClick={() => handleRemoveCharacter(c.id)}>
+              מחק
+            </button>
           </li>
         ))}
       </ul>
