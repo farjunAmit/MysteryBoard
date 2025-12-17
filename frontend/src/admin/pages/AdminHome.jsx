@@ -4,8 +4,9 @@ import ScenarioForm from "../components/ScenarioForm";
 function AdminHome() {
   const [scenarios, setScenarios] = useState([]); // List of scenarios from backend
   const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error message
   const [showCreateForm, setShowCreateForm] = useState(false); // Show/Hide modal for creating a new scenario
+  const [error, setError] = useState(null); // Error message
+  const [createError, setCreateError] = useState(null); //Error message for create scenario fail
 
   // Load all scenarios when component mounts
   useEffect(() => {
@@ -21,6 +22,51 @@ function AdminHome() {
         setLoading(false);
       });
   }, []);
+
+  async function handleScenarioCreated(payload) {
+    try {
+      const res = await fetch("http://localhost:5000/api/scenarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setCreateError(errorData.error || "שגיאה ביצירת תרחיש");
+        return;
+      }
+
+      const createdScenario = await res.json();
+      setScenarios((prev) => [...prev, createdScenario]);
+      setShowCreateForm(false);
+    } catch (err) {
+      console.error(err);
+      setCreateError("שגיאה בתקשורת עם השרת");
+    }
+  }
+
+  async function handleScenarioDelete(params) {}
+
+  async function handleScenarioDelete(id) {
+    if (!window.confirm("למחוק את התרחיש?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/scenarios/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setError(errorData.error || "שגיאה במחיקת תרחיש");
+        return;
+      }
+      setScenarios((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error(err);
+      setError("שגיאה בתקשורת עם השרת");
+    }
+  }
 
   return (
     <div style={{ padding: 24, direction: "rtl", fontFamily: "sans-serif" }}>
@@ -78,14 +124,7 @@ function AdminHome() {
             </div>
             <ScenarioForm
               onCancel={() => setShowCreateForm(false)}
-              onCreated={(payload) => {
-                const scenarioWithId = {
-                  ...payload,
-                  id: Date.now(),
-                };
-                setScenarios((prev) => [...prev, payload]);
-                setShowCreateForm(false);
-              }}
+              onCreated={(payload) => handleScenarioCreated(payload)}
             />
           </div>
         </div>
@@ -137,12 +176,26 @@ function AdminHome() {
               <strong>{s.name}</strong>
 
               {s.description && <p style={{ marginTop: 4 }}>{s.description}</p>}
-
               {(s.minPlayers || s.maxPlayers) && (
                 <p style={{ fontSize: 14, marginTop: 4, opacity: 0.8 }}>
                   שחקנים: {s.minPlayers ?? "?"}–{s.maxPlayers ?? "?"}
                 </p>
               )}
+              <button
+                type="button"
+                onClick={() => handleScenarioDelete(s.id)}
+                style={{
+                  marginTop: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: "#e74c3c",
+                  color: "white",
+                }}
+              >
+                מחק
+              </button>
             </div>
           ))}
         </div>
