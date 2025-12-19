@@ -1,5 +1,7 @@
-﻿const express = require("express");
+﻿require("dotenv").config();
+const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
 const PORT = 5000;
@@ -98,6 +100,18 @@ app.delete("/api/scenarios/:id", (req, res) => {
   return res.status(204).send();
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend server is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Connected to MongoDB");
+
+    app.listen(PORT, () => {
+      console.log(`Backend server is running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB or server connection error:", err);
+    process.exit(1);
+  }
+}
+
+startServer();
