@@ -39,28 +39,26 @@ const ScenarioSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-ScenarioSchema.pre("validate", function (next) {
+ScenarioSchema.pre("validate", function () {
   if (this.minPlayers > this.maxPlayers) {
-    return next(new Error("minPlayers cannot be greater than maxPlayers"));
+    throw new Error("minPlayers cannot be greater than maxPlayers");
   }
 
   if (this.mode === "characters") {
     if (Array.isArray(this.characters) && this.characters.length > 0) {
       if (this.characters.length !== this.maxPlayers) {
-        return next(new Error("characters count must equal maxPlayers"));
+        throw new Error("characters count must equal maxPlayers");
       }
     }
 
     if (Array.isArray(this.groups) && this.groups.length > 0) {
-      return next(new Error('mode="characters" cannot include groups'));
+      throw new Error('mode="characters" cannot include groups');
     }
   }
 
   if (this.mode === "groups") {
     if (Array.isArray(this.characters) && this.characters.length > 0) {
-      return next(
-        new Error('mode="groups" cannot include top-level characters')
-      );
+      throw new Error('mode="groups" cannot include top-level characters');
     }
 
     if (Array.isArray(this.groups) && this.groups.length > 0) {
@@ -68,16 +66,21 @@ ScenarioSchema.pre("validate", function (next) {
         const n = Array.isArray(g.characters) ? g.characters.length : 0;
         return sum + n;
       }, 0);
-      
+
       if (totalCharacters > 0 && totalCharacters !== this.maxPlayers) {
-        return next(
-          new Error("total characters in groups must equal maxPlayers")
-        );
+        throw new Error("total characters in groups must equal maxPlayers");
       }
     }
   }
+});
 
-  next();
+ScenarioSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
 });
 
 module.exports = mongoose.model("Scenario", ScenarioSchema);

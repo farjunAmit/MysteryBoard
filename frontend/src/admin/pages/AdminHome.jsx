@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ScenarioForm from "../components/ScenarioForm";
+import { API_BASE_URL } from "../config/api";
 
 function AdminHome() {
   const [scenarios, setScenarios] = useState([]); // List of scenarios from backend
@@ -10,7 +11,7 @@ function AdminHome() {
 
   // Load all scenarios when component mounts
   useEffect(() => {
-    fetch("http://localhost:5000/api/scenarios")
+    fetch(`${API_BASE_URL}${API_PATHS.scenarios}`)
       .then((res) => res.json())
       .then((data) => {
         setScenarios(data);
@@ -25,14 +26,15 @@ function AdminHome() {
 
   async function handleScenarioCreated(payload) {
     try {
-      const res = await fetch("http://localhost:5000/api/scenarios", {
+      const res = await fetch(`${API_BASE_URL}${API_PATHS.scenarios}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
-
+      console.log("create status:", res.status);
+      console.log("create body:", await res.clone().json());
       if (!res.ok) {
         const errorData = await res.json();
         setCreateError(errorData.error || "שגיאה ביצירת תרחיש");
@@ -48,12 +50,10 @@ function AdminHome() {
     }
   }
 
-  async function handleScenarioDelete(params) {}
-
   async function handleScenarioDelete(id) {
     if (!window.confirm("למחוק את התרחיש?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/scenarios/${id}`, {
+      const res = await fetch(`${API_BASE_URL}${API_PATHS.scenarios}/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
