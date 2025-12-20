@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Scenario = require("../models/Scenario");
 const GameSession = require("../models/GameSession");
+const { assertPhase, assertTransition } = require("../utils/sessionPhase");
 
 // POST /api/sessions
 router.post("/", async (req, res) => {
@@ -78,6 +79,7 @@ router.patch("/:id/slots/:slotIndex", async (req, res) => {
     if (Number.isNaN(idx) || idx < 0 || idx >= session.slots.length) {
       return res.status(400).json({ message: "Invalid slotIndex" });
     }
+    if (assertPhase(session, ["setup"], res)) return;
 
     session.slots[idx].photoUrl = photoUrl;
     await session.save();
@@ -105,9 +107,10 @@ router.post("/:id/phase", async (req, res) => {
       return res.status(404).json({ message: "Session not found" });
     }
 
+    if (assertTransition(session, phase, res)) return;
+
     session.phase = phase;
     await session.save();
-
     return res.json(session);
   } catch (err) {
     console.error("Update phase error:", err);
@@ -132,11 +135,7 @@ router.post("/:id/events/trait", async (req, res) => {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    if (session.phase !== "running") {
-      return res
-        .status(400)
-        .json({ message: "Session must be in running phase" });
-    }
+    if (assertPhase(session, ["running"], res)) return;
 
     session.events.push({
       type: "trait_revealed",
@@ -167,11 +166,8 @@ router.post("/:id/chat", async (req, res) => {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    if (session.phase !== "running") {
-      return res
-        .status(400)
-        .json({ message: "Session must be in running phase" });
-    }
+    if (assertPhase(session, ["reveal", "running"], res)) return;
+
     session.events.push({
       type: "chat",
       text,
@@ -180,6 +176,26 @@ router.post("/:id/chat", async (req, res) => {
     return res.json(session);
   } catch (err) {
     console.error("Add chat error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /api/sessions/:id/end
+router.post("/:id/end", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await GameSession.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    if (assertTransition(session, "ended", res)) return;
+
+    session.phase = "ended";
+    await session.save();
+
+    return res.json(session);
+  } catch (err) {
+    console.error("End session error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
