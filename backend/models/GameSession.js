@@ -20,6 +20,30 @@ const SlotSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const EventSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["trait_revealed", "chat"],
+      required: true,
+    },
+    characterId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 const GameSessionSchema = new mongoose.Schema(
   {
     scenarioId: {
@@ -41,6 +65,11 @@ const GameSessionSchema = new mongoose.Schema(
 
     slots: {
       type: [SlotSchema],
+      default: [],
+    },
+
+    events: {
+      type: [EventSchema],
       default: [],
     },
   },

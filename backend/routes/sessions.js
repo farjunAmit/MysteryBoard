@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
 // GET /api/sessions/:id
 router.get("/:id", async (req, res) => {
   try {
-    const id  = req.params.id;
+    const id = req.params.id;
 
     const session = await GameSession.findById(id);
     if (!session) {
@@ -95,7 +95,7 @@ router.post("/:id/phase", async (req, res) => {
     const { id } = req.params;
     const { phase } = req.body;
 
-    const allowed = ["setup", "reveal", "running", "ended"]; // (ממליץ)
+    const allowed = ["setup", "reveal", "running", "ended"];
     if (!allowed.includes(phase)) {
       return res.status(400).json({ message: "Invalid phase" });
     }
@@ -115,5 +115,73 @@ router.post("/:id/phase", async (req, res) => {
   }
 });
 
+// POST /api/sessions/:id/events/trait
+router.post("/:id/events/trait", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { characterId, text } = req.body;
+
+    if (!characterId || !text) {
+      return res
+        .status(400)
+        .json({ message: "characterId and text are required" });
+    }
+
+    const session = await GameSession.findById(id);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.phase !== "running") {
+      return res
+        .status(400)
+        .json({ message: "Session must be in running phase" });
+    }
+
+    session.events.push({
+      type: "trait_revealed",
+      characterId,
+      text,
+    });
+
+    await session.save();
+    return res.json(session);
+  } catch (err) {
+    console.error("Add trait event error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /api/sessions/:id/chat
+router.post("/:id/chat", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const text = req.body.text;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: "text is required" });
+    }
+
+    const session = await GameSession.findById(id);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.phase !== "running") {
+      return res
+        .status(400)
+        .json({ message: "Session must be in running phase" });
+    }
+    session.events.push({
+      type: "chat",
+      text,
+    });
+    await session.save();
+    return res.json(session);
+  } catch (err) {
+    console.error("Add chat error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;
