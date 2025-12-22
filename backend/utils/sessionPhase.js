@@ -15,12 +15,8 @@ const PHASE_ORDER = ["setup", "reveal", "running", "ended"];
 function isValidTransition(from, to) {
   const fromIdx = PHASE_ORDER.indexOf(from);
   const toIdx = PHASE_ORDER.indexOf(to);
-
   if (fromIdx === -1 || toIdx === -1) return false;
-  if (toIdx <= fromIdx) return false;
-  if (toIdx !== fromIdx + 1) return false;
-
-  return true;
+  return toIdx === fromIdx + 1;
 }
 
 function assertTransition(session, nextPhase, res) {
@@ -30,7 +26,9 @@ function assertTransition(session, nextPhase, res) {
       message: `Cannot transition from '${session.phase}' to '${nextPhase}'`,
       from: session.phase,
       to: nextPhase,
-      allowedNext: [PHASE_ORDER[PHASE_ORDER.indexOf(session.phase) + 1]].filter(Boolean),
+      allowedNext: [PHASE_ORDER[PHASE_ORDER.indexOf(session.phase) + 1]].filter(
+        Boolean
+      ),
     });
   }
   return null;
