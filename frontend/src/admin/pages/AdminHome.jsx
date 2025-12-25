@@ -131,7 +131,7 @@ function AdminHome() {
 
       {/* Empty list message */}
       {!loading && !error && scenarios.length === 0 && (
-        <p>אין עדיין תרחישים 😅</p>
+        <p>אין תרחישים זמינים</p>
       )}
 
       {/* Display scenario cards */}

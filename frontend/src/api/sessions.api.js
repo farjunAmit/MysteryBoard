@@ -12,4 +12,15 @@ export const SessionsApi = {
       body: JSON.stringify({ scenarioId }),
     });
   },
+
+  getFullById(id) {
+    return http(`${API_PATHS.sessions}/${id}/full`);
+  },
+
+  addSlot(sessionId, characterId) {
+    return http(`${API_PATHS.sessions}/${sessionId}/slots`, {
+      method: "POST",
+      body: JSON.stringify({ characterId }),
+    });
+  },
 };

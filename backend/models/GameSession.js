@@ -72,6 +72,20 @@ const GameSessionSchema = new mongoose.Schema(
       type: [EventSchema],
       default: [],
     },
+
+    reveal: {
+  mode: {
+    type: String,
+    enum: ["fast", "slow"],
+    default: "slow",
+  },
+  revealedCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+},
+
   },
   { timestamps: true }
 );
