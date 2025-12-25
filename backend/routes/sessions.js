@@ -303,6 +303,18 @@ router.post("/:id/start", async (req, res) => {
     const transitionErr = assertTransition(session, "reveal", res);
     if (transitionErr) return;
 
+    const missing = (session.slots || [])
+      .filter((s) => !s.photoUrl || !String(s.photoUrl).trim())
+      .map((s) => s.slotIndex);
+
+    if (missing.length > 0) {
+      return res.status(409).json({
+        error: "MISSING_PHOTOS",
+        message: "Cannot start reveal before all slots have photoUrl",
+        missingSlotIndexes: missing,
+      });
+    }
+
     session.phase = "reveal";
     session.reveal = session.reveal || {};
     session.reveal.mode = mode;
@@ -388,6 +400,56 @@ router.post("/:id/reveal/complete", async (req, res) => {
     session.phase = "running";
     await session.save();
 
+    return res.json(session);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "SERVER_ERROR", message: err.message });
+  }
+});
+
+// PATCH /api/sessions/:id/slots/:slotIndex/photo
+router.patch("/:id/slots/:slotIndex/photo", async (req, res) => {
+  try {
+    const { id, slotIndex } = req.params;
+    const { photoUrl } = req.body;
+
+    if (!photoUrl || typeof photoUrl !== "string" || !photoUrl.trim()) {
+      return res.status(400).json({
+        error: "INVALID_PHOTO_URL",
+        message: "photoUrl is required and must be a non-empty string",
+      });
+    }
+
+    const session = await GameSession.findById(id);
+    if (!session) {
+      return res
+        .status(404)
+        .json({ error: "NOT_FOUND", message: "Session not found" });
+    }
+
+    const phaseErr = assertPhase(session, ["setup"], res);
+    if (phaseErr) return;
+
+    const idx = Number(slotIndex);
+    if (!Number.isInteger(idx) || idx < 0) {
+      return res.status(400).json({
+        error: "INVALID_SLOT_INDEX",
+        message: "slotIndex must be a non-negative integer",
+      });
+    }
+
+    const slot = (session.slots || []).find((s) => s.slotIndex === idx);
+    if (!slot) {
+      return res.status(404).json({
+        error: "SLOT_NOT_FOUND",
+        message: `No slot with slotIndex=${idx} in this session`,
+      });
+    }
+
+    slot.photoUrl = photoUrl.trim();
+
+    await session.save();
     return res.json(session);
   } catch (err) {
     return res

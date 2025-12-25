@@ -23,4 +23,18 @@ export const SessionsApi = {
       body: JSON.stringify({ characterId }),
     });
   },
+
+  setSlotPhoto(sessionId, slotIndex, photoUrl) {
+    return http(`${API_PATHS.sessions}/${sessionId}/slots/${slotIndex}/photo`, {
+      method: "PATCH",
+      body: JSON.stringify({ photoUrl }),
+    });
+  },
+
+  start(sessionId, mode) {
+    return http(`${API_PATHS.sessions}/${sessionId}/start`, {
+      method: "POST",
+      body: JSON.stringify({ mode }),
+    });
+  },
 };

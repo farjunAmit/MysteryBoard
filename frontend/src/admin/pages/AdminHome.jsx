@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import ScenarioForm from "../components/ScenarioForm";
-import { API_PATHS } from "../../config/api";
 import { SessionsApi } from "../../api/sessions.api";
 import { ScenariosApi } from "../../api/scenarios.api";
 import { useNavigate } from "react-router-dom";
