@@ -37,4 +37,11 @@ export const SessionsApi = {
       body: JSON.stringify({ mode }),
     });
   },
+
+  revealTrait(sessionId, characterId, text) {
+    return http(`${API_PATHS.sessions}/${sessionId}/events/trait`, {
+      method: "POST",
+      body: JSON.stringify({ characterId, text }),
+    });
+  },
 };
