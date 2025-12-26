@@ -1,5 +1,6 @@
 ﻿require("dotenv").config();
 const scenariosRouter = require("./routes/scenarios");
+const sessionsRouter = require("./routes/sessions");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -10,6 +11,7 @@ const PORT = 5000;
 app.use(express.json());
 app.use(cors());
 app.use("/api/scenarios", scenariosRouter);
+app.use("/api/sessions", sessionsRouter);
 
 
 app.get("/api/ping", (req, res) => {

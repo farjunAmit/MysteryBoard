@@ -5,7 +5,7 @@ const CharacterSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     description: { type: String, default: "", trim: true },
     traits: { type: [String], default: [] },
-    required: { type: Boolean, default: true },
+    required: { type: Boolean, default: false },
   },
   { _id: true }
 );

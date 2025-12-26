@@ -1,70 +1,64 @@
 import { useEffect, useState } from "react";
 import ScenarioForm from "../components/ScenarioForm";
-import { API_BASE_URL } from "../config/api";
+import { SessionsApi } from "../../api/sessions.api";
+import { ScenariosApi } from "../../api/scenarios.api";
+import { useNavigate } from "react-router-dom";
 
 function AdminHome() {
   const [scenarios, setScenarios] = useState([]); // List of scenarios from backend
   const [loading, setLoading] = useState(true); // Loading state
   const [showCreateForm, setShowCreateForm] = useState(false); // Show/Hide modal for creating a new scenario
   const [error, setError] = useState(null); // Error message
+  const navigate = useNavigate();
   const [createError, setCreateError] = useState(null); //Error message for create scenario fail
 
   // Load all scenarios when component mounts
   useEffect(() => {
-    fetch(`${API_BASE_URL}${API_PATHS.scenarios}`)
-      .then((res) => res.json())
-      .then((data) => {
+    (async () => {
+      try {
+        const data = await ScenariosApi.getAll();
         setScenarios(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error loading scenarios:", err);
         setError("שגיאה בטעינת התרחישים");
+      } finally {
         setLoading(false);
-      });
+      }
+    })();
   }, []);
+
+  async function handleStartLive(scenarioId) {
+    try {
+      setError(null);
+      const createdSession = await SessionsApi.create(scenarioId);
+      navigate(`/admin/sessions/${createdSession._id}`);
+    } catch (e) {
+      setError(e.message || "שגיאה ביצירת סשן");
+    }
+  }
 
   async function handleScenarioCreated(payload) {
     try {
-      const res = await fetch(`${API_BASE_URL}${API_PATHS.scenarios}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      console.log("create status:", res.status);
-      console.log("create body:", await res.clone().json());
-      if (!res.ok) {
-        const errorData = await res.json();
-        setCreateError(errorData.error || "שגיאה ביצירת תרחיש");
-        return;
-      }
-
-      const createdScenario = await res.json();
+      setCreateError(null);
+      const createdScenario = await ScenariosApi.create(payload);
       setScenarios((prev) => [...prev, createdScenario]);
       setShowCreateForm(false);
     } catch (err) {
       console.error(err);
-      setCreateError("שגיאה בתקשורת עם השרת");
+      setCreateError(err.message || "שגיאה בתקשורת עם השרת");
     }
   }
 
   async function handleScenarioDelete(id) {
     if (!window.confirm("למחוק את התרחיש?")) return;
+
     try {
-      const res = await fetch(`${API_BASE_URL}${API_PATHS.scenarios}/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.error || "שגיאה במחיקת תרחיש");
-        return;
-      }
+      setError(null);
+      await ScenariosApi.remove(id);
       setScenarios((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       console.error(err);
-      setError("שגיאה בתקשורת עם השרת");
+      setError(err.message || "שגיאה בתקשורת עם השרת");
     }
   }
 
@@ -136,7 +130,7 @@ function AdminHome() {
 
       {/* Empty list message */}
       {!loading && !error && scenarios.length === 0 && (
-        <p>אין עדיין תרחישים 😅</p>
+        <p>אין תרחישים זמינים</p>
       )}
 
       {/* Display scenario cards */}
@@ -181,6 +175,22 @@ function AdminHome() {
                   שחקנים: {s.minPlayers ?? "?"}–{s.maxPlayers ?? "?"}
                 </p>
               )}
+              <button
+                type="button"
+                onClick={() => handleStartLive(s.id)}
+                style={{
+                  marginTop: 8,
+                  marginLeft: 8,
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: "#2ecc71",
+                  color: "white",
+                }}
+              >
+                פתח לייב
+              </button>
               <button
                 type="button"
                 onClick={() => handleScenarioDelete(s.id)}
