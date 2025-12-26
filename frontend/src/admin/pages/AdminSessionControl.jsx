@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import CharactersList from "../components/CharactersList";
+import SessionChat from "../components/SessionChat"
 
 export default function AdminSessionControl() {
   const { id } = useParams();
@@ -67,17 +68,27 @@ export default function AdminSessionControl() {
   }
 
   async function handleRevealTrait(characterId, traitText) {
-    const res = await fetch(`/api/sessions/${session._id}/events/trait`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      const updatedSession = await SessionsApi.revealTrait(
+        session._id,
         characterId,
-        text: traitText,
-      }),
-    });
+        traitText
+      );
+      setSession(updatedSession);
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Failed to send trait");
+    }
+  }
 
-    const updatedSession = await res.json();
-    setSession(updatedSession);
+  async function handleSendMessage(text) {
+    try {
+      const updatedSession = await SessionsApi.addChat(session._id, text);
+      setSession(updatedSession);
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Failed to send message");
+    }
   }
 
   return (
@@ -88,6 +99,10 @@ export default function AdminSessionControl() {
         slots={session.slots}
         events={session.events}
         onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
+      />
+      <SessionChat
+        disabled={session.phase !== "running"}
+        onSend={handleSendMessage}
       />
     </div>
   );

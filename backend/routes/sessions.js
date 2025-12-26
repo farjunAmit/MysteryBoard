@@ -79,37 +79,6 @@ router.get("/:id/full", async (req, res) => {
   }
 });
 
-// PATCH /api/sessions/:id/slots/:slotIndex
-router.patch("/:id/slots/:slotIndex", async (req, res) => {
-  try {
-    const { id, slotIndex } = req.params;
-    const { photoUrl } = req.body;
-
-    if (!photoUrl) {
-      return res.status(400).json({ message: "photoUrl is required" });
-    }
-
-    const session = await GameSession.findById(id);
-    if (!session) {
-      return res.status(404).json({ message: "Session not found" });
-    }
-
-    const idx = Number(slotIndex);
-    if (Number.isNaN(idx) || idx < 0 || idx >= session.slots.length) {
-      return res.status(400).json({ message: "Invalid slotIndex" });
-    }
-    if (assertPhase(session, ["setup"], res)) return;
-
-    session.slots[idx].photoUrl = photoUrl;
-    await session.save();
-
-    return res.json(session);
-  } catch (err) {
-    console.error("Update slot photo error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
 // POST /api/sessions/:id/phase
 router.post("/:id/phase", async (req, res) => {
   try {

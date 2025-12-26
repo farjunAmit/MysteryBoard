@@ -7,12 +7,17 @@ export default function CharactersList({
   onRevealTrait,
 }) {
   return (
-    <div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: "16px",
+      }}
+    >
       {slots.map((slot) => {
         const character = characters.find(
           (c) => String(c._id) === String(slot.characterId)
         );
-
         if (!character) return null;
 
         return (

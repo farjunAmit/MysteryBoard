@@ -44,4 +44,11 @@ export const SessionsApi = {
       body: JSON.stringify({ characterId, text }),
     });
   },
+
+  addChat(sessionId, text) {
+    return http(`${API_PATHS.sessions}/${sessionId}/chat`, {
+      method: "POST",
+      body: JSON.stringify({ text }),
+    });
+  },
 };
