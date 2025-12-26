@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import CharactersList from "../components/CharactersList";
-import SessionChat from "../components/SessionChat"
+import SessionChat from "../components/SessionChat";
 
 export default function AdminSessionControl() {
   const { id } = useParams();
@@ -91,6 +91,18 @@ export default function AdminSessionControl() {
     }
   }
 
+  async function handleEndSession() {
+    try {
+      await SessionsApi.end(session._id);
+      await SessionsApi.delete(session._id);
+
+      navigate("/admin"); // change to your real admin home route
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Failed to end session");
+    }
+  }
+
   return (
     <div style={{ padding: 16, direction: "rtl", fontFamily: "sans-serif" }}>
       <h2>Game Control</h2>
@@ -104,6 +116,11 @@ export default function AdminSessionControl() {
         disabled={session.phase !== "running"}
         onSend={handleSendMessage}
       />
+      {session.phase === "running" && (
+        <button type="button" onClick={handleEndSession}>
+          End Session
+        </button>
+      )}
     </div>
   );
 }

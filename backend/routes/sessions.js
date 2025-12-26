@@ -139,7 +139,7 @@ router.post("/:id/events/trait", async (req, res) => {
   }
 });
 
-// POST /api/sessions/:id/chat
+// POST /api/sessions/:id/events/chat
 router.post("/:id/chat", async (req, res) => {
   try {
     const id = req.params.id;
@@ -424,6 +424,21 @@ router.patch("/:id/slots/:slotIndex/photo", async (req, res) => {
     return res
       .status(500)
       .json({ error: "SERVER_ERROR", message: err.message });
+  }
+});
+
+// DELETE /api/sessions/:id
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await GameSession.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "Session not found" });
+
+    return res.json({ message: "Session deleted" });
+  } catch (err) {
+    console.error("Delete session error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 

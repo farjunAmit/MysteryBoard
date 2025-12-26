@@ -51,4 +51,16 @@ export const SessionsApi = {
       body: JSON.stringify({ text }),
     });
   },
+
+  end(sessionId) {
+    return http(`${API_PATHS.sessions}/${sessionId}/end`, {
+      method: "POST",
+    });
+  },
+
+  delete(sessionId) {
+    return http(`${API_PATHS.sessions}/${sessionId}`, {
+      method: "DELETE",
+    });
+  },
 };
