@@ -106,6 +106,22 @@ export default function AdminSessionControl() {
   return (
     <div style={{ padding: 16, direction: "rtl", fontFamily: "sans-serif" }}>
       <h2>Game Control</h2>
+      <div
+        style={{
+          position: "fixed",
+          top: 12,
+          left: 12,
+          padding: "6px 10px",
+          border: "1px solid #444",
+          background: "#111",
+          color: "#fff",
+          zIndex: 1000,
+          fontSize: 14,
+        }}
+      >
+        Join Code: <b>{session?.joinCode || "—"}</b>
+      </div>
+
       <CharactersList
         characters={scenario.characters}
         slots={session.slots}

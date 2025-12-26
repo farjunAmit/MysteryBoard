@@ -43,6 +43,16 @@ router.post("/", async (req, res) => {
   }
 });
 
+// GET /api/sessions/join/:code
+router.get("/join/:code", async (req, res) => {
+  const code = (req.params.code || "").toUpperCase().trim();
+
+  const session = await GameSession.findOne({ joinCode: code });
+  if (!session) return res.status(404).json({ message: "Session not found" });
+
+  res.json(session);
+});
+
 // GET /api/sessions/:id
 router.get("/:id", async (req, res) => {
   try {
@@ -287,6 +297,9 @@ router.post("/:id/start", async (req, res) => {
     session.phase = "reveal";
     session.reveal = session.reveal || {};
     session.reveal.mode = mode;
+    if (!session.joinCode) {
+      session.joinCode = await generateUniqueJoinCode(GameSession);
+    }
 
     const total = (session.slots || []).length;
     session.reveal.revealedCount = mode === "fast" ? total : 0;

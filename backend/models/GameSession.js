@@ -85,6 +85,8 @@ const GameSessionSchema = new mongoose.Schema(
         min: 0,
       },
     },
+
+    joinCode: { type: String, unique: true, index: true, sparse: true },
   },
   { timestamps: true }
 );
