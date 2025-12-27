@@ -1,18 +1,12 @@
 import { http } from "./http";
-import { API_PATHS } from "./config";
+import { API_PATHS } from "../config/api";
 
 export const ClientSessionsApi = {
-  async getByJoinCode(joinCode) {
-    const { data } = await http.get(
-      `${API_PATHS.clientSessions}/by-code/${joinCode}`
-    );
-    return data;
+  getByJoinCode(joinCode) {
+    return http(`${API_PATHS.clientSessions}/by-code/${joinCode}`);
   },
 
-  async getState(sessionId) {
-    const { data } = await http.get(
-      `${API_PATHS.clientSessions}/${sessionId}/state`
-    );
-    return data;
+  getState(sessionId) {
+    return http(`${API_PATHS.clientSessions}/${sessionId}/state`);
   },
 };
