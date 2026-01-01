@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClientSessionsApi } from "../../api/clientSessions.api";
+import { texts as t } from "../../texts";
 
 export default function ClientJoin() {
   const [joinCode, setJoinCode] = useState("");
@@ -11,7 +12,7 @@ export default function ClientJoin() {
 
   const handleJoin = async () => {
     if (!joinCode.trim()) {
-      setError("Please enter a join code");
+      setError(texts.client.join.errorEmptyCode);
       return;
     }
 
@@ -21,7 +22,7 @@ export default function ClientJoin() {
       const session = await ClientSessionsApi.getByJoinCode(joinCode.trim());
       navigate(`/client/${session._id}`);
     } catch (err) {
-      setError("Invalid join code or session not available");
+      setError(t.client.join.errorInvalidCode);
     } finally {
       setLoading(false);
     }
@@ -29,11 +30,11 @@ export default function ClientJoin() {
 
   return (
     <div style={styles.container}>
-      <h1>Join Game</h1>
+      <h1>{t.client.join.title}</h1>
 
       <input
         type="text"
-        placeholder="Enter join code"
+        placeholder={t.client.join.inputPlaceholder}
         value={joinCode}
         onChange={(e) => setJoinCode(e.target.value)}
         disabled={loading}
@@ -41,7 +42,9 @@ export default function ClientJoin() {
       />
 
       <button onClick={handleJoin} disabled={loading} style={styles.button}>
-        {loading ? "Checking..." : "Join"}
+        {loading
+          ? t.client.join.loadingButton
+          : t.client.join.joinButton}
       </button>
 
       {error && <div style={styles.error}>{error}</div>}

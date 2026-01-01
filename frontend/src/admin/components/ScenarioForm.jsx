@@ -1,52 +1,47 @@
 import { useState } from "react";
 import CharacterForm from "./CharacterForm";
+import { texts as t } from "../../texts";
 
 export default function ScenarioForm({ onCancel, onCreated }) {
-  const [name, setName] = useState(""); // scenario name input
-  const [description, setDescription] = useState(""); // scenario description
-  const [minPlayers, setMinPlayers] = useState(""); // minimum players (as string for input)
-  const [maxPlayers, setMaxPlayers] = useState(""); // maximum players (as string for input)
-  const [characters, setCharacters] = useState([]); // characters in the game
-  const [error, setError] = useState(null); // validation error message
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [minPlayers, setMinPlayers] = useState("");
+  const [maxPlayers, setMaxPlayers] = useState("");
+  const [characters, setCharacters] = useState([]);
+  const [error, setError] = useState(null);
 
   function handleSubmit(e) {
-    e.preventDefault(); // prevent page reload
+    e.preventDefault();
 
-    // Reset any previous error
     setError(null);
     const min = Number(minPlayers);
     const max = Number(maxPlayers);
 
-    // Validation: Name is required
     if (!name.trim()) {
-      setError("יש להזין שם תרחיש");
+      setError(t.admin.scenarioForm.validation.nameRequired);
       return;
     }
 
-    // Validation: Minimum players required
     if (!min) {
-      setError("יש להזין מינימום שחקנים");
+      setError(t.admin.scenarioForm.validation.minPlayersRequired);
       return;
     }
 
-    // Validation: Maximum players required
     if (!max) {
-      setError("יש להזין מקסימום שחקנים");
+      setError(t.admin.scenarioForm.validation.maxPlayersRequired);
       return;
     }
 
-    // Optional: ensure min <= max
     if (min > max) {
-      setError("מינימום שחקנים לא יכול להיות גדול מהמקסימום");
+      setError(t.admin.scenarioForm.validation.minGreaterThanMax);
       return;
     }
 
     if (characters.length !== max) {
-      setError("כמות הדמויות חייבת להיות זהה למספר השחקנים המקסימאלי");
+      setError(t.admin.scenarioForm.validation.charactersMustMatchMax);
       return;
     }
 
-    // If everything is valid → build payload
     const payload = {
       name: name.trim(),
       description: description.trim() || null,
@@ -57,21 +52,20 @@ export default function ScenarioForm({ onCancel, onCreated }) {
 
     console.log("Creating scenario with data:", payload);
 
-    if (onCreated) {
-      onCreated(payload);
-    }
+    onCreated?.(payload);
   }
 
   function handleRemoveCharacter(id) {
     setCharacters((prev) => prev.filter((c) => c.id !== id));
-    setError(null)
+    setError(null);
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Scenario name field */}
       <div style={{ marginBottom: 12 }}>
-        <label style={{ display: "block", marginBottom: 4 }}>שם התרחיש:</label>
+        <label style={{ display: "block", marginBottom: 4 }}>
+          {t.admin.scenarioForm.labels.scenarioName}:
+        </label>
         <input
           type="text"
           value={name}
@@ -85,10 +79,9 @@ export default function ScenarioForm({ onCancel, onCreated }) {
         />
       </div>
 
-      {/* Scenario description field */}
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: "block", marginBottom: 4 }}>
-          תיאור (לא חובה)
+          {t.admin.scenarioForm.labels.description}
         </label>
         <textarea
           value={description}
@@ -103,11 +96,10 @@ export default function ScenarioForm({ onCancel, onCreated }) {
         />
       </div>
 
-      {/* Min / Max players fields */}
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <div style={{ flex: 1 }}>
           <label style={{ display: "block", marginBottom: 4 }}>
-            מינימום שחקנים
+            {t.admin.scenarioForm.labels.minPlayers}
           </label>
           <input
             type="number"
@@ -125,7 +117,7 @@ export default function ScenarioForm({ onCancel, onCreated }) {
 
         <div style={{ flex: 1 }}>
           <label style={{ display: "block", marginBottom: 4 }}>
-            מקסימום שחקנים
+            {t.admin.scenarioForm.labels.maxPlayers}
           </label>
           <input
             type="number"
@@ -142,16 +134,15 @@ export default function ScenarioForm({ onCancel, onCreated }) {
         </div>
       </div>
 
-      <CharacterForm
-        onAdd={(char) => setCharacters((prev) => [...prev, char])}
-      />
+      <CharacterForm onAdd={(char) => setCharacters((prev) => [...prev, char])} />
 
       <ul>
         {characters.map((c) => (
           <li key={c.id}>
-            {c.name} {c.required ? "(חובה)" : ""} - {c.traits.join(", ")}
+            {c.name} {c.required ? t.admin.scenarioForm.labels.requiredTag : ""} -{" "}
+            {c.traits.join(", ")}
             <button type="button" onClick={() => handleRemoveCharacter(c.id)}>
-              מחק
+              {t.admin.scenarioForm.buttons.delete}
             </button>
           </li>
         ))}
@@ -159,7 +150,6 @@ export default function ScenarioForm({ onCancel, onCreated }) {
 
       {error && <p style={{ color: "red", marginBottom: 12 }}>{error}</p>}
 
-      {/* Cancel button */}
       <button
         type="button"
         onClick={onCancel}
@@ -172,10 +162,9 @@ export default function ScenarioForm({ onCancel, onCreated }) {
           marginRight: 12,
         }}
       >
-        בטל
+        {t.common.actions.cancel}
       </button>
 
-      {/* Submit button */}
       <button
         type="submit"
         style={{
@@ -187,7 +176,7 @@ export default function ScenarioForm({ onCancel, onCreated }) {
           color: "white",
         }}
       >
-        צור תרחיש
+        {t.common.actions.create}
       </button>
     </form>
   );

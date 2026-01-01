@@ -1,4 +1,11 @@
+import { texts as t } from "../../texts";
 import CharacterCard from "./CharacterCard";
+
+const gridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "16px",
+};
 
 export default function CharactersList({
   characters = [],
@@ -6,14 +13,12 @@ export default function CharactersList({
   events = [],
   onRevealTrait,
 }) {
+  if (!slots.length) {
+    return <p>{t.admin.charactersList.empty}</p>;
+  }
+
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: "16px",
-      }}
-    >
+    <div style={gridStyle}>
       {slots.map((slot) => {
         const character = characters.find(
           (c) => String(c._id) === String(slot.characterId)

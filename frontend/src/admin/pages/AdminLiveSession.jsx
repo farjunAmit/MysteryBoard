@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
+import { texts as t } from "../../texts";
 
 export default function AdminLiveSession() {
   const { id } = useParams();
@@ -26,7 +27,7 @@ export default function AdminLiveSession() {
           setDesiredPlayers(data.session.playerCount);
         }
       } catch (e) {
-        if (!cancelled) setError(e.message || "Failed to load session");
+        if (!cancelled) setError(e?.message || t.admin.liveSession.errors.load);
       }
     }
 
@@ -36,7 +37,9 @@ export default function AdminLiveSession() {
     };
   }, [id]);
 
-  if (!session || !scenario) return <div style={{ padding: 16 }}>Loading…</div>;
+  if (!session || !scenario) {
+    return <div style={{ padding: 16 }}>{t.common.status.loading}</div>;
+  }
 
   const chars = scenario.characters || [];
   const mandatoryChars = chars.filter((c) => c.required);
@@ -47,10 +50,10 @@ export default function AdminLiveSession() {
   async function addOptional(characterId) {
     try {
       setError("");
-      const updated = await SessionsApi.addSlot(session._id, characterId);
+      const updated = await SessionsApi.addSlot(session.id, characterId);
       setSession(updated);
     } catch (e) {
-      setError(e.message || "Failed to add character");
+      setError(e?.message || t.admin.liveSession.errors.addCharacter);
     }
   }
 
@@ -60,14 +63,14 @@ export default function AdminLiveSession() {
       setError("");
 
       const updatedSession = await SessionsApi.setSlotPhoto(
-        session._id,
+        session.id,
         slotIndex,
         photoUrl
       );
 
       setSession(updatedSession);
     } catch (err) {
-      setError(err.message || "Failed to save photo");
+      setError(err?.message || t.admin.liveSession.errors.savePhoto);
     } finally {
       setBusy(false);
     }
@@ -78,11 +81,11 @@ export default function AdminLiveSession() {
       setBusy(true);
       setError("");
 
-      const updatedSession = await SessionsApi.start(session._id, mode);
+      const updatedSession = await SessionsApi.start(session.id, mode);
       setSession(updatedSession);
       navigate(`/admin/sessions/${id}/control`);
     } catch (err) {
-      setError(err.message || "Failed to start session");
+      setError(err?.message || t.admin.liveSession.errors.startSession);
     } finally {
       setBusy(false);
     }
@@ -93,11 +96,11 @@ export default function AdminLiveSession() {
 
     const current = slot.photoUrl || "";
     const url = window.prompt(
-      `Paste photo URL for slot ${slot.slotIndex}:`,
+      t.admin.liveSession.prompts.photoUrl(slot.slotIndex),
       current
     );
 
-    if (url == null) return; // user cancelled
+    if (url == null) return;
 
     const trimmed = url.trim();
     if (!trimmed) return;
@@ -105,9 +108,15 @@ export default function AdminLiveSession() {
     await savePhoto(slot.slotIndex, trimmed);
   }
 
+  const allPhotosPresent =
+    (session.slots || []).length > 0 &&
+    (session.slots || []).every((s) => Boolean(s.photoUrl));
+  const canPlay = session.phase === "setup" && allPhotosPresent && !busy;
+
   return (
-    <div style={{ padding: 16, direction: "rtl", fontFamily: "sans-serif" }}>
-      <h2>Live Session</h2>
+    <div style={{ padding: 16, fontFamily: "sans-serif" }}>
+      <h2>{t.admin.liveSession.title}</h2>
+
       {error && (
         <div
           style={{
@@ -127,19 +136,21 @@ export default function AdminLiveSession() {
         style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}
       >
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>Session ID:</strong> {session._id}
+          <strong>{t.admin.liveSession.meta.sessionId}:</strong> {session.id}
         </div>
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>Phase:</strong> {session.phase}
+          <strong>{t.admin.liveSession.meta.phase}:</strong> {session.phase}
         </div>
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>Players:</strong> {session.playerCount}
+          <strong>{t.admin.liveSession.meta.players}:</strong>{" "}
+          {session.playerCount}
         </div>
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>Slots:</strong> {session.slots?.length ?? 0}
+          <strong>{t.admin.liveSession.meta.slots}:</strong>{" "}
+          {session.slots?.length ?? 0}
         </div>
       </div>
-      {/* PLAY controls (setup only) */}
+
       {session.phase === "setup" && (
         <div
           style={{
@@ -154,7 +165,7 @@ export default function AdminLiveSession() {
             background: "#fafafa",
           }}
         >
-          <strong>PLAY:</strong>
+          <strong>{t.admin.liveSession.play.label}</strong>
 
           <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <input
@@ -165,7 +176,7 @@ export default function AdminLiveSession() {
               onChange={() => setMode("slow")}
               disabled={busy}
             />
-            Slow
+            {t.admin.liveSession.play.modes.slow}
           </label>
 
           <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -177,24 +188,24 @@ export default function AdminLiveSession() {
               onChange={() => setMode("fast")}
               disabled={busy}
             />
-            Fast
+            {t.admin.liveSession.play.modes.fast}
           </label>
 
           <button
             type="button"
             onClick={startSession}
-            disabled={busy}
+            disabled={!canPlay}
             style={{
               padding: "8px 14px",
-              cursor: busy ? "not-allowed" : "pointer",
+              cursor: canPlay ? "pointer" : "not-allowed",
               fontWeight: 700,
             }}
-            title="Start reveal phase"
+            title={t.admin.liveSession.play.startTitle}
           >
-            PLAY
+            {t.admin.liveSession.play.start}
           </button>
 
-          <span style={{ opacity: 0.8 }}>(צריך תמונה לכל דמות לפני PLAY)</span>
+          <span style={{ opacity: 0.8 }}>{t.admin.liveSession.play.hint}</span>
         </div>
       )}
 
@@ -206,7 +217,7 @@ export default function AdminLiveSession() {
           alignItems: "center",
         }}
       >
-        <strong>מספר שחקנים:</strong>
+        <strong>{t.admin.liveSession.desiredPlayers.label}</strong>
 
         <select
           value={desiredPlayers}
@@ -223,14 +234,13 @@ export default function AdminLiveSession() {
         </select>
 
         <span style={{ opacity: 0.8 }}>
-          נבחרו: {currentPlayers} / {desiredPlayers}
+          {t.admin.liveSession.desiredPlayers.selected} {currentPlayers} /{" "}
+          {desiredPlayers}
         </span>
       </div>
 
       {!session.slots || session.slots.length === 0 ? (
-        <p style={{ opacity: 0.8 }}>
-          אין סלוטים בסשן הזה. כנראה שאין דמויות חובה בתרחיש שנבחר.
-        </p>
+        <p style={{ opacity: 0.8 }}>{t.admin.liveSession.states.noSlots}</p>
       ) : (
         <div
           style={{
@@ -250,13 +260,15 @@ export default function AdminLiveSession() {
               }}
             >
               <div>
-                <strong>Slot:</strong> {slot.slotIndex}
+                <strong>{t.admin.liveSession.slots.slot}:</strong>{" "}
+                {slot.slotIndex}
               </div>
               <div style={{ wordBreak: "break-all" }}>
-                <strong>CharacterId:</strong> {slot.characterId}
+                <strong>{t.admin.liveSession.slots.characterId}:</strong>{" "}
+                {slot.characterId}
               </div>
               <div style={{ marginTop: 8 }}>
-                <strong>Photo:</strong>{" "}
+                <strong>{t.admin.liveSession.slots.photo}:</strong>{" "}
                 <div
                   style={{
                     marginTop: 6,
@@ -264,7 +276,9 @@ export default function AdminLiveSession() {
                     color: slot.photoUrl ? "green" : "crimson",
                   }}
                 >
-                  {slot.photoUrl ? "OK" : "Missing photo"}
+                  {slot.photoUrl
+                    ? t.admin.liveSession.slots.photoOk
+                    : t.admin.liveSession.slots.photoMissing}
                 </div>
               </div>
               <button
@@ -272,12 +286,13 @@ export default function AdminLiveSession() {
                 disabled={busy}
                 onClick={() => handleSetPhoto(slot)}
               >
-                Set Photo
+                {t.admin.liveSession.slots.setPhoto}
               </button>
             </div>
           ))}
         </div>
       )}
+
       <div
         style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}
       >
@@ -290,10 +305,10 @@ export default function AdminLiveSession() {
             padding: 12,
           }}
         >
-          <strong>דמויות חובה</strong>
+          <strong>{t.admin.liveSession.characters.mandatory}</strong>
           <ul>
             {mandatoryChars.map((c) => (
-              <li key={c._id}>{c.name}</li>
+              <li key={c.id}>{c.name}</li>
             ))}
           </ul>
         </div>
@@ -307,17 +322,17 @@ export default function AdminLiveSession() {
             padding: 12,
           }}
         >
-          <strong>דמויות לא חובה</strong>
+          <strong>{t.admin.liveSession.characters.optional}</strong>
           <ul style={{ paddingInlineStart: 18 }}>
             {optionalChars.map((c) => {
               const isPicked = (session.slots || []).some(
-                (s) => String(s.characterId) === String(c._id)
+                (s) => String(s.characterId) === String(c.id)
               );
               const disabled = isPicked || !canAddMore;
 
               return (
                 <li
-                  key={c._id}
+                  key={c.id}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -327,7 +342,7 @@ export default function AdminLiveSession() {
                 >
                   <button
                     type="button"
-                    onClick={() => addOptional(c._id)}
+                    onClick={() => addOptional(c.id)}
                     disabled={disabled}
                     style={{
                       width: 28,
@@ -336,17 +351,17 @@ export default function AdminLiveSession() {
                     }}
                     title={
                       isPicked
-                        ? "כבר נבחרה"
+                        ? t.admin.liveSession.tooltips.alreadyPicked
                         : !canAddMore
-                        ? "הגעת למספר השחקנים"
-                        : "הוסף"
+                        ? t.admin.liveSession.tooltips.reachedLimit
+                        : t.admin.liveSession.tooltips.add
                     }
                   >
                     +
                   </button>
 
                   <span style={{ opacity: isPicked ? 0.6 : 1 }}>
-                    {c.name} {isPicked ? "(נבחרה)" : ""}
+                    {c.name} {isPicked ? `(${t.admin.liveSession.picked})` : ""}
                   </span>
                 </li>
               );

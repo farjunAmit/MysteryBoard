@@ -3,14 +3,15 @@ import ScenarioForm from "../components/ScenarioForm";
 import { SessionsApi } from "../../api/sessions.api";
 import { ScenariosApi } from "../../api/scenarios.api";
 import { useNavigate } from "react-router-dom";
+import { texts as t } from "../../texts";
 
 function AdminHome() {
   const [scenarios, setScenarios] = useState([]); // List of scenarios from backend
   const [loading, setLoading] = useState(true); // Loading state
   const [showCreateForm, setShowCreateForm] = useState(false); // Show/Hide modal for creating a new scenario
   const [error, setError] = useState(null); // Error message
+  const [createError, setCreateError] = useState(null); // Error message for create scenario fail
   const navigate = useNavigate();
-  const [createError, setCreateError] = useState(null); //Error message for create scenario fail
 
   // Load all scenarios when component mounts
   useEffect(() => {
@@ -20,7 +21,7 @@ function AdminHome() {
         setScenarios(data);
       } catch (err) {
         console.error("Error loading scenarios:", err);
-        setError("שגיאה בטעינת התרחישים");
+        setError(t.admin.adminHome.errors.loadScenarios);
       } finally {
         setLoading(false);
       }
@@ -31,9 +32,10 @@ function AdminHome() {
     try {
       setError(null);
       const createdSession = await SessionsApi.create(scenarioId);
-      navigate(`/admin/sessions/${createdSession._id}`);
-    } catch (e) {
-      setError(e.message || "שגיאה ביצירת סשן");
+      navigate(`/admin/sessions/${createdSession.id}`);
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || t.admin.adminHome.errors.createSession);
     }
   }
 
@@ -45,12 +47,14 @@ function AdminHome() {
       setShowCreateForm(false);
     } catch (err) {
       console.error(err);
-      setCreateError(err.message || "שגיאה בתקשורת עם השרת");
+      setCreateError(
+        err?.message || t.admin.adminHome.errors.serverCommunication
+      );
     }
   }
 
   async function handleScenarioDelete(id) {
-    if (!window.confirm("למחוק את התרחיש?")) return;
+    if (!window.confirm(t.admin.adminHome.confirm.deleteScenario)) return;
 
     try {
       setError(null);
@@ -58,29 +62,28 @@ function AdminHome() {
       setScenarios((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       console.error(err);
-      setError(err.message || "שגיאה בתקשורת עם השרת");
+      setError(err?.message || t.admin.adminHome.errors.serverCommunication);
     }
   }
 
   return (
-    <div style={{ padding: 24, direction: "rtl", fontFamily: "sans-serif" }}>
-      <h1>אזור אדמין – תרחישים 🎭</h1>
+    <div style={{ padding: 24, fontFamily: "sans-serif" }}>
+      <h1>{t.admin.adminHome.title}</h1>
 
       {/* Modal for creating a new scenario */}
       {showCreateForm && (
         <div
           style={{
             position: "fixed",
-            inset: 0, // covers the entire screen
-            backgroundColor: "rgba(0, 0, 0, 0.4)", // transparent dark overlay
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
           }}
-          onClick={() => setShowCreateForm(false)} // clicking outside closes modal
+          onClick={() => setShowCreateForm(false)}
         >
-          {/* Modal content container */}
           <div
             style={{
               backgroundColor: "white",
@@ -89,11 +92,9 @@ function AdminHome() {
               minWidth: 320,
               maxWidth: 500,
               boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-              direction: "rtl",
             }}
-            onClick={(e) => e.stopPropagation()} // prevent modal close on inner click
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal header */}
             <div
               style={{
                 display: "flex",
@@ -102,9 +103,9 @@ function AdminHome() {
                 marginBottom: 12,
               }}
             >
-              <h2 style={{ margin: 0 }}>יצירת לוח / תרחיש חדש</h2>
+              <h2 style={{ margin: 0 }}>{t.admin.adminHome.modal.title}</h2>
               <button
-                onClick={() => setShowCreateForm(false)} // close modal
+                onClick={() => setShowCreateForm(false)}
                 style={{
                   border: "none",
                   background: "transparent",
@@ -112,25 +113,30 @@ function AdminHome() {
                   cursor: "pointer",
                 }}
                 type="button"
+                aria-label={t.admin.adminHome.modal.close}
+                title={t.admin.adminHome.modal.close}
               >
                 ✕
               </button>
             </div>
+
+            {createError && <p style={{ color: "red" }}>{createError}</p>}
+
             <ScenarioForm
               onCancel={() => setShowCreateForm(false)}
-              onCreated={(payload) => handleScenarioCreated(payload)}
+              onCreated={handleScenarioCreated}
             />
           </div>
         </div>
       )}
 
       {/* Loading / error states */}
-      {loading && <p>טוען תרחישים...</p>}
+      {loading && <p>{t.admin.adminHome.states.loading}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {/* Empty list message */}
       {!loading && !error && scenarios.length === 0 && (
-        <p>אין תרחישים זמינים</p>
+        <p>{t.admin.adminHome.states.empty}</p>
       )}
 
       {/* Display scenario cards */}
@@ -170,11 +176,15 @@ function AdminHome() {
               <strong>{s.name}</strong>
 
               {s.description && <p style={{ marginTop: 4 }}>{s.description}</p>}
+
               {(s.minPlayers || s.maxPlayers) && (
                 <p style={{ fontSize: 14, marginTop: 4, opacity: 0.8 }}>
-                  שחקנים: {s.minPlayers ?? "?"}–{s.maxPlayers ?? "?"}
+                  {t.admin.adminHome.labels.players}:{" "}
+                  {s.minPlayers ?? t.admin.adminHome.labels.unknown}–
+                  {s.maxPlayers ?? t.admin.adminHome.labels.unknown}
                 </p>
               )}
+
               <button
                 type="button"
                 onClick={() => handleStartLive(s.id)}
@@ -189,8 +199,9 @@ function AdminHome() {
                   color: "white",
                 }}
               >
-                פתח לייב
+                {t.admin.adminHome.actions.openLive}
               </button>
+
               <button
                 type="button"
                 onClick={() => handleScenarioDelete(s.id)}
@@ -204,7 +215,7 @@ function AdminHome() {
                   color: "white",
                 }}
               >
-                מחק
+                {t.admin.adminHome.actions.delete}
               </button>
             </div>
           ))}
@@ -223,7 +234,7 @@ function AdminHome() {
         }}
         onClick={() => setShowCreateForm(true)}
       >
-        + הוסף תרחיש חדש
+        {t.admin.adminHome.actions.addNewScenario}
       </button>
     </div>
   );
