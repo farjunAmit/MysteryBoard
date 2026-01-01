@@ -13,7 +13,7 @@ export default function AdminLiveSession() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const sessionId = session?.id ?? session?._id;
   useEffect(() => {
     let cancelled = false;
 
@@ -50,7 +50,7 @@ export default function AdminLiveSession() {
   async function addOptional(characterId) {
     try {
       setError("");
-      const updated = await SessionsApi.addSlot(session.id, characterId);
+      const updated = await SessionsApi.addSlot(sessionId, characterId);
       setSession(updated);
     } catch (e) {
       setError(e?.message || t.admin.liveSession.errors.addCharacter);
@@ -63,7 +63,7 @@ export default function AdminLiveSession() {
       setError("");
 
       const updatedSession = await SessionsApi.setSlotPhoto(
-        session.id,
+        sessionId,
         slotIndex,
         photoUrl
       );
@@ -81,7 +81,7 @@ export default function AdminLiveSession() {
       setBusy(true);
       setError("");
 
-      const updatedSession = await SessionsApi.start(session.id, mode);
+      const updatedSession = await SessionsApi.start(sessionId, mode);
       setSession(updatedSession);
       navigate(`/admin/sessions/${id}/control`);
     } catch (err) {
@@ -136,7 +136,7 @@ export default function AdminLiveSession() {
         style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}
       >
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>{t.admin.liveSession.meta.sessionId}:</strong> {session.id}
+          <strong>{t.admin.liveSession.meta.sessionId}:</strong> {sessionId}
         </div>
         <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
           <strong>{t.admin.liveSession.meta.phase}:</strong> {session.phase}

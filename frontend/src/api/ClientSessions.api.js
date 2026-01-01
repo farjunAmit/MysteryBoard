@@ -3,7 +3,11 @@ import { API_PATHS } from "../config/api";
 
 export const ClientSessionsApi = {
   getByJoinCode(joinCode) {
-    return http(`${API_PATHS.clientSessions}/by-code/${joinCode}`);
+    return http(`${API_PATHS.clientSessions}/join`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ joinCode }),
+    });
   },
 
   getState(sessionId) {

@@ -38,14 +38,14 @@ export default function ClientScreen() {
     return (idx) => idx < revealedCount;
   }, [revealedCount]);
 
-  if (loading)
-    return <div style={{ padding: 16 }}>{t.client.screen.loading}</div>;
   if (error)
     return (
       <div style={{ padding: 16 }}>
         {t.client.screen.errorPrefix} {error}
       </div>
     );
+  if (!data && loading)
+    return <div style={{ padding: 16 }}>{t.client.screen.loading}</div>;
   if (!data)
     return <div style={{ padding: 16 }}>{t.client.screen.notFound}</div>;
 
