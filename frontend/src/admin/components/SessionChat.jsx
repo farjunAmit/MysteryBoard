@@ -1,5 +1,6 @@
 // src/components/ChatSender.jsx
 import { useState } from "react";
+import { texts as t } from "../../texts";
 
 export default function ChatSender({ onSend, disabled = false }) {
   const [text, setText] = useState("");
@@ -11,7 +12,8 @@ export default function ChatSender({ onSend, disabled = false }) {
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Type a message..."
+        placeholder={t.common.chat.inputPlaceholder}
+        disabled={disabled}
       />
 
       <button
@@ -22,7 +24,7 @@ export default function ChatSender({ onSend, disabled = false }) {
           setText("");
         }}
       >
-        Send
+        {t.common.chat.send}
       </button>
     </div>
   );

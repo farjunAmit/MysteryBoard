@@ -3,6 +3,7 @@ import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import CharactersList from "../components/CharactersList";
 import SessionChat from "../components/SessionChat";
+import { texts as t } from "../../texts";
 
 export default function AdminSessionControl() {
   const { id } = useParams();
@@ -10,7 +11,9 @@ export default function AdminSessionControl() {
   const [scenario, setScenario] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
   const canRevealTraits = session?.phase === "running";
+
   useEffect(() => {
     let cancelled = false;
 
@@ -23,7 +26,7 @@ export default function AdminSessionControl() {
           setScenario(data.scenario);
         }
       } catch (e) {
-        if (!cancelled) setError(e.message || "Failed to load session");
+        if (!cancelled) setError(e?.message || t.admin.sessionControl.errors.load);
       }
     }
 
@@ -35,7 +38,7 @@ export default function AdminSessionControl() {
 
   useEffect(() => {
     // Do nothing if session is not loaded yet
-    if (!session?._id) return;
+    if (!session?.id) return;
 
     // Poll only while in the "reveal" phase
     if (session.phase !== "reveal") return;
@@ -45,7 +48,7 @@ export default function AdminSessionControl() {
     const intervalId = setInterval(async () => {
       try {
         // Lightweight fetch – we only need the updated session state
-        const updatedSession = await SessionsApi.getById(session._id);
+        const updatedSession = await SessionsApi.getById(session.id);
 
         // Avoid state updates after unmount / cleanup
         if (!cancelled) {
@@ -54,58 +57,62 @@ export default function AdminSessionControl() {
       } catch (err) {
         console.error("Session polling failed:", err);
       }
-    }, 1500); // Poll every 1.5 seconds
+    }, 1500);
 
     // Cleanup when leaving the reveal phase or unmounting the component
     return () => {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [session?._id, session?.phase]);
+  }, [session?.id, session?.phase]);
 
   if (!session || !scenario) {
-    return <div style={{ padding: 16 }}>{error ? error : "Loading…"}</div>;
+    return (
+      <div style={{ padding: 16 }}>
+        {error ? error : t.common.status.loading}
+      </div>
+    );
   }
 
   async function handleRevealTrait(characterId, traitText) {
     try {
       const updatedSession = await SessionsApi.revealTrait(
-        session._id,
+        session.id,
         characterId,
         traitText
       );
       setSession(updatedSession);
     } catch (e) {
       console.error(e);
-      alert(e.message || "Failed to send trait");
+      alert(e?.message || t.admin.sessionControl.errors.sendTrait);
     }
   }
 
   async function handleSendMessage(text) {
     try {
-      const updatedSession = await SessionsApi.addChat(session._id, text);
+      const updatedSession = await SessionsApi.addChat(session.id, text);
       setSession(updatedSession);
     } catch (e) {
       console.error(e);
-      alert(e.message || "Failed to send message");
+      alert(e?.message || t.admin.sessionControl.errors.sendMessage);
     }
   }
 
   async function handleEndSession() {
     try {
-      await SessionsApi.end(session._id);
-      await SessionsApi.delete(session._id);
-
-      navigate("/admin"); // change to your real admin home route
+      await SessionsApi.end(session.id);
+      await SessionsApi.delete(session.id);
+      navigate("/admin");
     } catch (e) {
       console.error(e);
-      alert(e.message || "Failed to end session");
+      alert(e?.message || t.admin.sessionControl.errors.endSession);
     }
   }
 
   return (
-    <div style={{ padding: 16, direction: "rtl", fontFamily: "sans-serif" }}>
-      <h2>Game Control</h2>
+    <div style={{ padding: 16, fontFamily: "sans-serif" }}>
+      <h2>{t.admin.sessionControl.title}</h2>
+
       <div
         style={{
           position: "fixed",
@@ -119,7 +126,8 @@ export default function AdminSessionControl() {
           fontSize: 14,
         }}
       >
-        Join Code: <b>{session?.joinCode || "—"}</b>
+        {t.admin.sessionControl.labels.joinCode}:{" "}
+        <b>{session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}</b>
       </div>
 
       <CharactersList
@@ -128,13 +136,15 @@ export default function AdminSessionControl() {
         events={session.events}
         onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
       />
+
       <SessionChat
         disabled={session.phase !== "running"}
         onSend={handleSendMessage}
       />
+
       {session.phase === "running" && (
         <button type="button" onClick={handleEndSession}>
-          End Session
+          {t.admin.sessionControl.actions.endSession}
         </button>
       )}
     </div>

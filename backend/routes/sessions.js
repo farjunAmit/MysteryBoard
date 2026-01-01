@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const { generateUniqueJoinCode } = require("../utils/joinCode");
 const Scenario = require("../models/Scenario");
 const GameSession = require("../models/GameSession");
 const { assertPhase, assertTransition } = require("../utils/sessionPhase");

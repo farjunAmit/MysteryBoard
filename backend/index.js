@@ -1,6 +1,7 @@
 ﻿require("dotenv").config();
 const scenariosRouter = require("./routes/scenarios");
 const sessionsRouter = require("./routes/sessions");
+const clientSessionsRouter = require("./routes/clientSessions");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -12,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/scenarios", scenariosRouter);
 app.use("/api/sessions", sessionsRouter);
-
+app.use("/api/client/sessions",clientSessionsRouter);
 
 app.get("/api/ping", (req, res) => {
   res.json({ message: "pong from backend 🧩" });

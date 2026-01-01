@@ -1,52 +1,40 @@
-import { useState } from "react";
+import { texts as t } from "../../texts";
+import CharacterCard from "./CharacterCard";
 
-export default function CharacterForm({ onAdd }) {
-  const [name, setName] = useState(""); //character name
-  const [required, setRequired] = useState(false); //if this character is must in the scenario
-  const [traits, setTraits] = useState(""); //character traits
+const gridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "16px",
+};
 
-  function handleAddClick(e) {
-    onAdd({
-      id: Date.now(),
-      name,
-      required,
-      traits: traits.split(",").map((t) => t.trim()), //split traits with "," and remove spaces
-    });
-
-    setName("");
-    setTraits("");
-    setRequired(false);
+export default function CharactersList({
+  characters = [],
+  slots = [],
+  events = [],
+  onRevealTrait,
+}) {
+  if (!slots.length) {
+    return <p>{t.admin.charactersList.empty}</p>;
   }
 
   return (
-    <div>
-      <input
-        placeholder="שם הדמות"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+    <div style={gridStyle}>
+      {slots.map((slot) => {
+        const character = characters.find(
+          (c) => String(c._id) === String(slot.characterId)
+        );
+        if (!character) return null;
 
-      <label>
-        <input
-          type="checkbox"
-          checked={required}
-          onChange={(e) => setRequired(e.target.checked)}
-        />
-        דמות חובה
-      </label>
-
-      <input
-        placeholder="תכונות (מופרדות בפסיק)"
-        value={traits}
-        onChange={(e) => setTraits(e.target.value)}
-      />
-
-      <button
-        type="button" // 👈 חשוב! לא submit
-        onClick={handleAddClick}
-      >
-        הוסף דמות
-      </button>
+        return (
+          <CharacterCard
+            key={String(slot.characterId)}
+            character={character}
+            slot={slot}
+            events={events}
+            onRevealTrait={onRevealTrait}
+          />
+        );
+      })}
     </div>
   );
 }
