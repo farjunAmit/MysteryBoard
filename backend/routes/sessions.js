@@ -313,83 +313,6 @@ router.post("/:id/start", async (req, res) => {
   }
 });
 
-// POST /api/sessions/:id/reveal/next
-router.post("/:id/reveal/next", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const session = await GameSession.findById(id);
-    if (!session) {
-      return res
-        .status(404)
-        .json({ error: "NOT_FOUND", message: "Session not found" });
-    }
-
-    const phaseErr = assertPhase(session, ["reveal"], res);
-    if (phaseErr) return;
-
-    if (session.reveal?.mode !== "slow") {
-      return res.status(409).json({
-        error: "INVALID_REVEAL_MODE",
-        message: "Reveal next is allowed only in slow mode",
-        mode: session.reveal?.mode ?? null,
-      });
-    }
-
-    const total = (session.slots || []).length;
-    const curr = session.reveal?.revealedCount ?? 0;
-    session.reveal.revealedCount = Math.min(curr + 1, total);
-
-    await session.save();
-    return res.json(session);
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "SERVER_ERROR", message: err.message });
-  }
-});
-
-// POST /api/sessions/:id/reveal/complete
-router.post("/:id/reveal/complete", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const session = await GameSession.findById(id);
-    if (!session) {
-      return res
-        .status(404)
-        .json({ error: "NOT_FOUND", message: "Session not found" });
-    }
-
-    const phaseErr = assertPhase(session, ["reveal"], res);
-    if (phaseErr) return;
-
-    const total = (session.slots || []).length;
-    const curr = session.reveal?.revealedCount ?? 0;
-
-    if (curr !== total) {
-      return res.status(409).json({
-        error: "REVEAL_INCOMPLETE",
-        message: "Cannot complete reveal before all slots are revealed",
-        revealedCount: curr,
-        totalSlots: total,
-      });
-    }
-
-    const transitionErr = assertTransition(session, "running", res);
-    if (transitionErr) return;
-
-    session.phase = "running";
-    await session.save();
-
-    return res.json(session);
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "SERVER_ERROR", message: err.message });
-  }
-});
-
 // PATCH /api/sessions/:id/slots/:slotIndex/photo
 router.patch("/:id/slots/:slotIndex/photo", async (req, res) => {
   try {
@@ -452,6 +375,28 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.error("Delete session error:", err);
     return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/:id/chat/clear", async (req, res) => {
+  try {
+    const session = await GameSession.findById(req.params.id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const phaseErr = assertPhase(session, ["running"], res);
+    if (phaseErr) return;
+
+    session.events.push({
+      type: "chat_cleared",
+      text: "cleared", // ✅ לא ריק כדי לעבור required
+      characterId: null,
+    });
+
+    await session.save();
+    return res.json(session);
+  } catch (err) {
+    console.error("chat clear error:", err);
+    return res.status(500).json({ message: err.message || "Server error" });
   }
 });
 

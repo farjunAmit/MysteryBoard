@@ -26,7 +26,8 @@ export default function AdminSessionControl() {
           setScenario(data.scenario);
         }
       } catch (e) {
-        if (!cancelled) setError(e?.message || t.admin.sessionControl.errors.load);
+        if (!cancelled)
+          setError(e?.message || t.admin.sessionControl.errors.load);
       }
     }
 
@@ -98,6 +99,16 @@ export default function AdminSessionControl() {
     }
   }
 
+  async function handleClearMessage() {
+    try {
+      const updatedSession = await SessionsApi.clearChat(session.id);
+      setSession(updatedSession);
+    } catch (e) {
+      console.error(e);
+      alert(e?.message || t.admin.sessionControl.errors.sendMessage);
+    }
+  }
+
   async function handleEndSession() {
     try {
       await SessionsApi.end(session.id);
@@ -127,7 +138,9 @@ export default function AdminSessionControl() {
         }}
       >
         {t.admin.sessionControl.labels.joinCode}:{" "}
-        <b>{session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}</b>
+        <b>
+          {session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}
+        </b>
       </div>
 
       <CharactersList
@@ -140,6 +153,7 @@ export default function AdminSessionControl() {
       <SessionChat
         disabled={session.phase !== "running"}
         onSend={handleSendMessage}
+        onClear={handleClearMessage}
       />
 
       {session.phase === "running" && (

@@ -10,17 +10,17 @@ export default function ClientJoin() {
 
   const navigate = useNavigate();
 
-  const handleJoin = async () => {
+  const handleJoin = async () => {  
     if (!joinCode.trim()) {
-      setError(texts.client.join.errorEmptyCode);
+      setError(t.client.join.errorEmptyCode);
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      const session = await ClientSessionsApi.getByJoinCode(joinCode.trim());
-      navigate(`/client/${session._id}`);
+      const { sessionId } = await ClientSessionsApi.getByJoinCode(joinCode.trim());
+      navigate(`/client/${sessionId}`);
     } catch (err) {
       setError(t.client.join.errorInvalidCode);
     } finally {
@@ -42,9 +42,7 @@ export default function ClientJoin() {
       />
 
       <button onClick={handleJoin} disabled={loading} style={styles.button}>
-        {loading
-          ? t.client.join.loadingButton
-          : t.client.join.joinButton}
+        {loading ? t.client.join.loadingButton : t.client.join.joinButton}
       </button>
 
       {error && <div style={styles.error}>{error}</div>}

@@ -22,32 +22,35 @@ export function useClientSession(sessionId, options = {}) {
   const aliveRef = useRef(true);
   const requestIdRef = useRef(0);
 
-  const refetch = useCallback(async () => {
-    if (!enabled || !sessionId) return;
+  const refetch = useCallback(
+    async (showLoading = false) => {
+      if (!enabled || !sessionId) return;
 
-    const reqId = ++requestIdRef.current;
+      const reqId = ++requestIdRef.current;
 
-    try {
-      setError("");
-      setLoading(true);
+      try {
+        setError("");
+        if (showLoading) setLoading(true);
 
-      const payload = await ClientSessionsApi.getState(sessionId);
+        const payload = await ClientSessionsApi.getState(sessionId);
 
-      // ignore stale responses
-      if (!aliveRef.current || reqId !== requestIdRef.current) return;
-      setData(payload);
-    } catch (e) {
-      if (!aliveRef.current || reqId !== requestIdRef.current) return;
-      setError(e?.message || "Failed to load session");
-    } finally {
-      if (!aliveRef.current || reqId !== requestIdRef.current) return;
-      setLoading(false);
-    }
-  }, [enabled, sessionId]);
+        // ignore stale responses
+        if (!aliveRef.current || reqId !== requestIdRef.current) return;
+        setData(payload);
+      } catch (e) {
+        if (!aliveRef.current || reqId !== requestIdRef.current) return;
+        setError(e?.message || "Failed to load session");
+      } finally {
+        if (!aliveRef.current || reqId !== requestIdRef.current) return;
+        setLoading(false);
+      }
+    },
+    [enabled, sessionId]
+  );
 
   useEffect(() => {
     aliveRef.current = true;
-    refetch();
+    refetch(true);
 
     return () => {
       aliveRef.current = false;

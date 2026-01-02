@@ -63,4 +63,9 @@ export const SessionsApi = {
       method: "DELETE",
     });
   },
+  clearChat(sessionId) {
+    return http(`${API_PATHS.sessions}/${sessionId}/chat/clear`, {
+      method: "POST",
+    });
+  },
 };

@@ -24,7 +24,7 @@ const EventSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["trait_revealed", "chat"],
+      enum: ["trait_revealed", "chat", "chat_cleared"],
       required: true,
     },
     characterId: {
@@ -91,4 +91,12 @@ const GameSessionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+GameSessionSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
+});
 module.exports = mongoose.model("GameSession", GameSessionSchema);
