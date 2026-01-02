@@ -14,6 +14,7 @@ export default function ClientScreen() {
   const characters = data?.characters ?? [];
   const revealMode = (data?.reveal?.mode ?? "slow").toLowerCase();
   const revealedCount = data?.reveal?.revealedCount ?? 0;
+  const latestChat = data?.latestChat;
 
   const handleScreenClick = async () => {
     if (!data) return;
@@ -72,6 +73,22 @@ export default function ClientScreen() {
         characters={characters}
         isRevealedAtIndex={isRevealedAtIndex}
       />
+
+      {latestChat && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 12,
+            border: "1px solid #e5e7eb",
+            borderRadius: 12,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>
+            Message
+          </div>
+          <div style={{ fontSize: 16 }}>{latestChat.text}</div>
+        </div>
+      )}
     </div>
   );
 }

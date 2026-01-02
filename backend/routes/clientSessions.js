@@ -40,6 +40,18 @@ router.get("/:id/state", async (req, res) => {
         slotIndex: slot.slotIndex,
       };
     });
+    let latestChat = null;
+    for (let i = (session.events?.length ?? 0) - 1; i >= 0; i--) {
+      const e = session.events[i];
+      if (e.type === "chat_cleared") {
+        latestChat = null;
+        break;
+      }
+      if (e.type === "chat") {
+        latestChat = { text: e.text, createdAt: e.createdAt };
+        break;
+      }
+    }
 
     return res.json({
       phase: session.phase,
@@ -48,6 +60,7 @@ router.get("/:id/state", async (req, res) => {
         revealedCount: session.reveal?.revealedCount ?? 0,
       },
       characters,
+      latestChat,
     });
   } catch (err) {
     console.error("Client session state error:", err);

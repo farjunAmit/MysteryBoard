@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { texts as t } from "../../texts";
 
-export default function ChatSender({ onSend, disabled = false }) {
+export default function ChatSender({ onSend,onClear, disabled = false }) {
   const [text, setText] = useState("");
 
   const canSend = !disabled && text.trim().length > 0;
-
+  const canClear = !disabled
   return (
     <div>
       <input
@@ -26,6 +26,16 @@ export default function ChatSender({ onSend, disabled = false }) {
       >
         {t.common.chat.send}
       </button>
+      <button
+        type="button"
+        disabled={!canClear}
+        onClick={()=>{
+          onClear?.();
+          setText("");
+        }}
+        >
+          {t.common.chat.clear}
+        </button>
     </div>
   );
 }

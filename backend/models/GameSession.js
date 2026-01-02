@@ -24,7 +24,7 @@ const EventSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["trait_revealed", "chat"],
+      enum: ["trait_revealed", "chat", "chat_cleared"],
       required: true,
     },
     characterId: {

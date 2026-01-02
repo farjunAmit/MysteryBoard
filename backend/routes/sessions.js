@@ -378,4 +378,26 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.post("/:id/chat/clear", async (req, res) => {
+  try {
+    const session = await GameSession.findById(req.params.id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const phaseErr = assertPhase(session, ["running"], res);
+    if (phaseErr) return;
+
+    session.events.push({
+      type: "chat_cleared",
+      text: "cleared", // ✅ לא ריק כדי לעבור required
+      characterId: null,
+    });
+
+    await session.save();
+    return res.json(session);
+  } catch (err) {
+    console.error("chat clear error:", err);
+    return res.status(500).json({ message: err.message || "Server error" });
+  }
+});
+
 module.exports = router;

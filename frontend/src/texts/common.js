@@ -7,6 +7,7 @@ export const common = {
   chat: {
     inputPlaceholder: "Type a message...",
     send: "Send",
+    clear: "Clear",
   },
   status: {
     loading: "Loading...",
