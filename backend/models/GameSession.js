@@ -87,6 +87,12 @@ const GameSessionSchema = new mongoose.Schema(
     },
 
     joinCode: { type: String, unique: true, index: true, sparse: true },
+
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      index: true,
+    },
   },
   { timestamps: true }
 );

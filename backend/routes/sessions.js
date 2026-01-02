@@ -14,7 +14,10 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "scenarioId is required" });
     }
 
-    const scenario = await Scenario.findById(scenarioId);
+    const scenario = await Scenario.findOne({
+      _id: scenarioId,
+      ownerId: req.user.id,
+    });
     if (!scenario) {
       return res.status(404).json({ message: "Scenario not found" });
     }
@@ -31,6 +34,7 @@ router.post("/", async (req, res) => {
 
     const session = await GameSession.create({
       scenarioId: scenario._id,
+      ownerId: req.user.id, 
       phase: "setup",
       playerCount,
       slots,

@@ -1,12 +1,14 @@
 const express = require("express");
 const Scenario = require("../models/Scenario");
-
+const requireAuth = require("../middleware/requireAuth");
 const router = express.Router();
 
 // GET /api/scenarios
-router.get("/", async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   try {
-    const list = await Scenario.find().sort({ createdAt: -1 });
+    const list = await Scenario.find({ ownerId: req.user.id }).sort({
+      createdAt: -1,
+    });
     res.json(list);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch scenarios" });
@@ -14,7 +16,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/scenarios
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const { name, description, minPlayers, maxPlayers, characters, imageUrl } =
       req.body;
@@ -66,6 +68,7 @@ router.post("/", async (req, res) => {
       maxPlayers: Number(maxPlayers),
       characters: characters ?? [],
       imageUrl,
+      ownerId: req.user.id,
     });
 
     res.status(201).json(scenario);
@@ -75,7 +78,7 @@ router.post("/", async (req, res) => {
 });
 
 // DELETE /api/scenarios/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
 

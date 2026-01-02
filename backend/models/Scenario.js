@@ -35,6 +35,12 @@ const ScenarioSchema = new mongoose.Schema(
     },
     characters: { type: [CharacterSchema], default: [] },
     groups: { type: [GroupSchema], default: [] },
+
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      index: true,
+    },
   },
   { timestamps: true }
 );
