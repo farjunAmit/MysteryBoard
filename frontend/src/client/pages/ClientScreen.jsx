@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import CharactersGrid from "../components/CharactersGrid";
 import { useClientSession } from "../hook/useClientSession";
 import { texts as t } from "../../texts";
+import { ClientSessionsApi } from "../../api/clientSessions.api";
 
 export default function ClientScreen() {
   const { sessionId } = useParams();
@@ -11,32 +12,21 @@ export default function ClientScreen() {
   });
 
   const characters = data?.characters ?? [];
-  const revealMode = data?.revealMode ?? "SLOW";
+  const revealMode = (data?.reveal?.mode ?? "slow").toLowerCase();
+  const revealedCount = data?.reveal?.revealedCount ?? 0;
 
-  const [revealedCount, setRevealedCount] = useState(0);
-
-  useEffect(() => {
-    setRevealedCount(0);
-  }, [sessionId]);
-
-  useEffect(() => {
+  const handleScreenClick = async () => {
     if (!data) return;
+    if (data.phase !== "reveal") return;
+    if (revealMode !== "slow") return;
 
-    if (revealMode === "FAST") {
-      setRevealedCount(characters.length);
-    } else {
-      setRevealedCount(0);
-    }
-  }, [data, revealMode, characters.length]);
-
-  const handleScreenClick = () => {
-    if (revealMode !== "SLOW") return;
-    setRevealedCount((prev) => Math.min(prev + 1, characters.length));
+    await ClientSessionsApi.revealNext(sessionId);
   };
 
-  const isRevealedAtIndex = useMemo(() => {
-    return (idx) => idx < revealedCount;
-  }, [revealedCount]);
+  const isRevealedAtIndex = useMemo(
+    () => (idx) => idx < revealedCount,
+    [revealedCount]
+  );
 
   if (error)
     return (
@@ -44,8 +34,10 @@ export default function ClientScreen() {
         {t.client.screen.errorPrefix} {error}
       </div>
     );
+
   if (!data && loading)
     return <div style={{ padding: 16 }}>{t.client.screen.loading}</div>;
+
   if (!data)
     return <div style={{ padding: 16 }}>{t.client.screen.notFound}</div>;
 
@@ -71,6 +63,7 @@ export default function ClientScreen() {
             {t.client.screen.modeLabel} <b>{revealMode}</b> •{" "}
             {t.client.screen.revealedLabel} <b>{revealedCount}</b> /{" "}
             <b>{characters.length}</b>
+            {"  "}• phase: <b>{data.phase}</b>
           </div>
         </div>
       </div>

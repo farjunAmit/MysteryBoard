@@ -13,4 +13,10 @@ export const ClientSessionsApi = {
   getState(sessionId) {
     return http(`${API_PATHS.clientSessions}/${sessionId}/state`);
   },
+
+  revealNext(sessionId) {
+    return http(`${API_PATHS.clientSessions}/${sessionId}/reveal/next`, {
+      method: "POST",
+    });
+  },
 };

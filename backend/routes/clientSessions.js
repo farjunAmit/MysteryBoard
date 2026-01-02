@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Scenario = require("../models/Scenario");
 const GameSession = require("../models/GameSession");
+const { assertPhase, assertTransition } = require("../utils/sessionPhase");
 
 // GET /api/client/sessions/:id/state
 router.get("/:id/state", async (req, res) => {
@@ -23,11 +24,17 @@ router.get("/:id/state", async (req, res) => {
       const found = scenarioChars.find(
         (c) => String(c._id) === String(slot.characterId)
       );
-
+      const revealedForChar = (session.events || [])
+        .filter(
+          (e) =>
+            e.type === "trait_revealed" &&
+            String(e.characterId) === String(slot.characterId)
+        )
+        .map((e) => e.text);
       return {
         id: String(slot.characterId),
         name: found?.name || "Unknown",
-        traits: found?.traits || [],
+        traits: revealedForChar,
         required: Boolean(found?.required),
         photoUrl: slot.photoUrl || null,
         slotIndex: slot.slotIndex,
@@ -36,8 +43,10 @@ router.get("/:id/state", async (req, res) => {
 
     return res.json({
       phase: session.phase,
-      revealMode: session.reveal?.mode || "slow",
-      revealedCount: session.reveal?.revealedCount ?? 0,
+      reveal: {
+        mode: session.reveal?.mode ?? "slow",
+        revealedCount: session.reveal?.revealedCount ?? 0,
+      },
       characters,
     });
   } catch (err) {
@@ -54,9 +63,13 @@ router.post("/join", async (req, res) => {
       return res.status(400).json({ message: "joinCode is required" });
     }
 
-    const session = await GameSession.findOne({ joinCode: String(joinCode).trim() });
+    const session = await GameSession.findOne({
+      joinCode: String(joinCode).trim(),
+    });
     if (!session) {
-      return res.status(404).json({ message: "Invalid join code or session not available" });
+      return res
+        .status(404)
+        .json({ message: "Invalid join code or session not available" });
     }
 
     return res.json({ sessionId: session._id.toString() });
@@ -65,4 +78,90 @@ router.post("/join", async (req, res) => {
     return res.status(500).json({ message: e.message || "Server error" });
   }
 });
+
+// POST /api/client/sessions/:id/reveal/next
+router.post("/:id/reveal/next", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await GameSession.findById(id);
+    if (!session) {
+      return res
+        .status(404)
+        .json({ error: "NOT_FOUND", message: "Session not found" });
+    }
+
+    const phaseErr = assertPhase(session, ["reveal"], res);
+    if (phaseErr) return;
+
+    if ((session.reveal?.mode ?? "").toLowerCase() !== "slow") {
+      return res.status(409).json({
+        error: "INVALID_REVEAL_MODE",
+        message: "Reveal next is allowed only in slow mode",
+        mode: session.reveal?.mode ?? null,
+      });
+    }
+
+    const total = (session.slots || []).length;
+    const curr = session.reveal?.revealedCount ?? 0;
+    const next = Math.min(curr + 1, total);
+
+    session.reveal.revealedCount = next;
+
+    if (next >= total && session.phase !== "running") {
+      const transitionErr = assertTransition(session, "running", res);
+      if (transitionErr) return;
+      session.phase = "running";
+    }
+
+    await session.save();
+    return res.json(session);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "SERVER_ERROR", message: err.message });
+  }
+});
+
+// POST /api/client/sessions/:id/reveal/complete
+router.post("/:id/reveal/complete", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await GameSession.findById(id);
+    if (!session) {
+      return res
+        .status(404)
+        .json({ error: "NOT_FOUND", message: "Session not found" });
+    }
+
+    const phaseErr = assertPhase(session, ["reveal"], res);
+    if (phaseErr) return;
+
+    const total = (session.slots || []).length;
+    const curr = session.reveal?.revealedCount ?? 0;
+
+    if (curr !== total) {
+      return res.status(409).json({
+        error: "REVEAL_INCOMPLETE",
+        message: "Cannot complete reveal before all slots are revealed",
+        revealedCount: curr,
+        totalSlots: total,
+      });
+    }
+
+    const transitionErr = assertTransition(session, "running", res);
+    if (transitionErr) return;
+
+    session.phase = "running";
+    await session.save();
+
+    return res.json(session);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "SERVER_ERROR", message: err.message });
+  }
+});
+
 module.exports = router;
