@@ -3,10 +3,11 @@ const router = express.Router();
 const { generateUniqueJoinCode } = require("../utils/joinCode");
 const Scenario = require("../models/Scenario");
 const GameSession = require("../models/GameSession");
+const requireAuth = require("../middleware/requireAuth");
 const { assertPhase, assertTransition } = require("../utils/sessionPhase");
 
 // POST /api/sessions
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const { scenarioId } = req.body;
 

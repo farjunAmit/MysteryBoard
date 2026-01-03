@@ -134,9 +134,10 @@ function AdminHome() {
       {loading && <p>{t.admin.adminHome.states.loading}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Empty list message */}
       {!loading && !error && scenarios.length === 0 && (
-        <p>{t.admin.adminHome.states.empty}</p>
+        <p style={{ marginTop: 16, fontSize: 16, color: "#666" }}>
+          {t.admin.adminHome.states.empty}
+        </p>
       )}
 
       {/* Display scenario cards */}

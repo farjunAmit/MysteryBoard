@@ -141,4 +141,20 @@ export const admin = {
       endSession: "Failed to end session.",
     },
   },
+
+  login: {
+    loginTitle: "Admin Login",
+    registerTitle: "Admin Register",
+    emailPlaceholder: "Email",
+    passwordPlaceholder: "Password",
+    displayNamePlaceholder: "Display Name",
+    submitLogin: "Login",
+    submitRegister: "Register",
+    loading: "Loading...",
+    noAccount: "Don't have an account?",
+    haveAccount: "Already have an account?",
+    registerLink: "Register here",
+    loginLink: "Login here",
+    authError: "Authentication failed. Please try again.",
+  }
 };

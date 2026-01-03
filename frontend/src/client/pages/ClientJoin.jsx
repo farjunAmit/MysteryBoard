@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AdminConnect from "../../admin/components/AdminConnect";
 import { ClientSessionsApi } from "../../api/clientSessions.api";
 import { texts as t } from "../../texts";
 
@@ -7,6 +8,7 @@ export default function ClientJoin() {
   const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showAdminModal, setShowAdminModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -30,6 +32,13 @@ export default function ClientJoin() {
 
   return (
     <div style={styles.container}>
+      <button 
+        onClick={() => setShowAdminModal(true)} 
+        style={styles.adminButton}
+      >
+        Admin
+      </button>
+
       <h1>{t.client.join.title}</h1>
 
       <input
@@ -46,6 +55,8 @@ export default function ClientJoin() {
       </button>
 
       {error && <div style={styles.error}>{error}</div>}
+
+      <AdminConnect isOpen={showAdminModal} onClose={() => setShowAdminModal(false)} />
     </div>
   );
 }
@@ -58,6 +69,19 @@ const styles = {
     flexDirection: "column",
     gap: 12,
     textAlign: "center",
+    position: "relative",
+  },
+  adminButton: {
+    position: "fixed",
+    top: "20px",
+    right: "20px",
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "14px",
   },
   input: {
     padding: 10,
