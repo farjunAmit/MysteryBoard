@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http,httpAuth } from "./http";
 import { API_PATHS } from "../config/api";
 
 export const SessionsApi = {
@@ -7,7 +7,7 @@ export const SessionsApi = {
   },
 
   create(scenarioId) {
-    return http(API_PATHS.sessions, {
+    return httpAuth(API_PATHS.sessions, {
       method: "POST",
       body: JSON.stringify({ scenarioId }),
     });

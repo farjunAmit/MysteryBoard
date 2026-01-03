@@ -1,40 +1,53 @@
+import { useState } from "react";
 import { texts as t } from "../../texts";
-import CharacterCard from "./CharacterCard";
 
-const gridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: "16px",
-};
+export default function CharacterForm({ onAdd }) {
+  const [name, setName] = useState("");
+  const [required, setRequired] = useState(false);
+  const [traits, setTraits] = useState("");
 
-export default function CharactersList({
-  characters = [],
-  slots = [],
-  events = [],
-  onRevealTrait,
-}) {
-  if (!slots.length) {
-    return <p>{t.admin.charactersList.empty}</p>;
+  function handleAddClick(e) {
+    onAdd({
+      id: Date.now(),
+      name,
+      required,
+      traits: traits.split(",").map((t) => t.trim()),
+    });
+
+    setName("");
+    setTraits("");
+    setRequired(false);
   }
 
   return (
-    <div style={gridStyle}>
-      {slots.map((slot) => {
-        const character = characters.find(
-          (c) => String(c._id) === String(slot.characterId)
-        );
-        if (!character) return null;
+    <div>
+      <input
+        placeholder={t.admin.characterForm.namePlaceholder}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
 
-        return (
-          <CharacterCard
-            key={String(slot.characterId)}
-            character={character}
-            slot={slot}
-            events={events}
-            onRevealTrait={onRevealTrait}
-          />
-        );
-      })}
+      <label>
+        <input
+          type="checkbox"
+          checked={required}
+          onChange={(e) => setRequired(e.target.checked)}
+        />
+        {t.admin.characterForm.requiredLabel}
+      </label>
+
+      <input
+        placeholder={t.admin.characterForm.traitsPlaceholder}
+        value={traits}
+        onChange={(e) => setTraits(e.target.value)}
+      />
+
+      <button
+        type="button"
+        onClick={handleAddClick}
+      >
+        {t.admin.characterForm.addCharacter}
+      </button>
     </div>
   );
 }

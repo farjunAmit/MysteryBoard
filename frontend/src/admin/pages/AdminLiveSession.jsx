@@ -308,7 +308,7 @@ export default function AdminLiveSession() {
           <strong>{t.admin.liveSession.characters.mandatory}</strong>
           <ul>
             {mandatoryChars.map((c) => (
-              <li key={c.id}>{c.name}</li>
+              <li key={c._id}>{c.name}</li>
             ))}
           </ul>
         </div>
@@ -326,13 +326,13 @@ export default function AdminLiveSession() {
           <ul style={{ paddingInlineStart: 18 }}>
             {optionalChars.map((c) => {
               const isPicked = (session.slots || []).some(
-                (s) => String(s.characterId) === String(c.id)
+                (s) => String(s.characterId) === String(c._id)
               );
               const disabled = isPicked || !canAddMore;
 
               return (
                 <li
-                  key={c.id}
+                  key={c._id}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -342,7 +342,7 @@ export default function AdminLiveSession() {
                 >
                   <button
                     type="button"
-                    onClick={() => addOptional(c.id)}
+                    onClick={() => addOptional(c._id)}
                     disabled={disabled}
                     style={{
                       width: 28,

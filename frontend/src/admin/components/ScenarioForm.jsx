@@ -139,10 +139,10 @@ export default function ScenarioForm({ onCancel, onCreated }) {
       <ul>
         {characters.map((c) => (
           <li key={c.id}>
-            {c.name} {c.required ? t.admin.scenarioForm.labels.requiredTag : ""} -{" "}
+            {c.name} {c.required ? t.admin.scenarioForm.characterList.requiredTag : ""} -{" "}
             {c.traits.join(", ")}
             <button type="button" onClick={() => handleRemoveCharacter(c.id)}>
-              {t.admin.scenarioForm.buttons.delete}
+              {t.common.actions.delete}
             </button>
           </li>
         ))}
