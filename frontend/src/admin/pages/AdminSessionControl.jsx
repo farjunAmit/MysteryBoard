@@ -144,9 +144,12 @@ export default function AdminSessionControl() {
       </div>
 
       <CharactersList
-        characters={scenario.characters}
+        scenario={scenario}
+        characters={scenario.mode === "groups" ? [] : scenario.characters}
+        groups={scenario.mode === "groups" ? scenario.groups : []}
         slots={session.slots}
         events={session.events}
+        scenarioMode={scenario.mode}
         onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
       />
 

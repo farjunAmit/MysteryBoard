@@ -7,39 +7,90 @@ const { assertPhase, assertTransition } = require("../utils/sessionPhase");
 // GET /api/client/sessions/:id/state
 router.get("/:id/state", async (req, res) => {
   try {
-    const session = await GameSession.findById(req.params.id);
+    const session = await GameSession.findById(req.params.id); // Get session using URL param
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    const scenario = await Scenario.findById(session.scenarioId);
+    const scenario = await Scenario.findById(session.scenarioId); // Now we can use session.scenarioId
     if (!scenario) {
       return res.status(404).json({ message: "Scenario not found" });
     }
 
-    const scenarioChars = scenario.characters || [];
+    let characters = [];
+    let families = [];
 
-    // Build "characters" payload based on session.slots + scenario.characters
-    const characters = (session.slots || []).map((slot) => {
-      const found = scenarioChars.find(
-        (c) => String(c._id) === String(slot.characterId)
-      );
-      const revealedForChar = (session.events || [])
-        .filter(
-          (e) =>
-            e.type === "trait_revealed" &&
-            String(e.characterId) === String(slot.characterId)
-        )
-        .map((e) => e.text);
-      return {
-        id: String(slot.characterId),
-        name: found?.name || "Unknown",
-        traits: revealedForChar,
-        required: Boolean(found?.required),
-        photoUrl: slot.photoUrl || null,
-        slotIndex: slot.slotIndex,
-      };
-    });
+    if (scenario.mode === "groups") {
+      // Build characters with family grouping
+      (scenario.groups || []).forEach((group) => {
+        families.push({
+          id: group._id.toString(),
+          name: group.name,
+          sharedInfo: group.sharedInfo || "",
+        });
+      });
+
+      characters = (session.slots || []).map((slot) => {
+        let character = null;
+        let groupId = null;
+
+        // Find character and its group
+        for (const group of scenario.groups || []) {
+          character = (group.characters || []).find(
+            (c) => String(c._id) === String(slot.characterId)
+          );
+          if (character) {
+            groupId = group._id.toString();
+            break;
+          }
+        }
+
+        const revealedForChar = (session.events || [])
+          .filter(
+            (e) =>
+              e.type === "trait_revealed" &&
+              String(e.characterId) === String(slot.characterId)
+          )
+          .map((e) => e.text);
+
+        return {
+          id: String(slot.characterId),
+          name: character?.name || "Unknown",
+          traits: revealedForChar,
+          required: Boolean(character?.required),
+          photoUrl: slot.photoUrl || null,
+          slotIndex: slot.slotIndex,
+          familyId: groupId,
+          roleHint: character?.description || "",
+        };
+      });
+    } else {
+      // Standard mode - flat character list
+      const scenarioChars = scenario.characters || [];
+
+      characters = (session.slots || []).map((slot) => {
+        const found = scenarioChars.find(
+          (c) => String(c._id) === String(slot.characterId)
+        );
+        const revealedForChar = (session.events || [])
+          .filter(
+            (e) =>
+              e.type === "trait_revealed" &&
+              String(e.characterId) === String(slot.characterId)
+          )
+          .map((e) => e.text);
+        return {
+          id: String(slot.characterId),
+          name: found?.name || "Unknown",
+          traits: revealedForChar,
+          required: Boolean(found?.required),
+          photoUrl: slot.photoUrl || null,
+          slotIndex: slot.slotIndex,
+          roleHint: found?.description || "",
+        };
+      });
+    }
+
     let latestChat = null;
     for (let i = (session.events?.length ?? 0) - 1; i >= 0; i--) {
       const e = session.events[i];
@@ -59,6 +110,8 @@ router.get("/:id/state", async (req, res) => {
         mode: session.reveal?.mode ?? "slow",
         revealedCount: session.reveal?.revealedCount ?? 0,
       },
+      scenarioMode: scenario.mode,
+      families: scenario.mode === "groups" ? families : [],
       characters,
       latestChat,
     });
