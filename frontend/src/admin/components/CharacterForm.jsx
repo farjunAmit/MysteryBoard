@@ -8,7 +8,7 @@ export default function CharacterForm({ onAdd }) {
 
   function handleAddClick(e) {
     onAdd({
-      id: Date.now(),
+      id: Math.random().toString(36).substring(2, 11), 
       name,
       required,
       traits: traits.split(",").map((t) => t.trim()),
@@ -42,10 +42,7 @@ export default function CharacterForm({ onAdd }) {
         onChange={(e) => setTraits(e.target.value)}
       />
 
-      <button
-        type="button"
-        onClick={handleAddClick}
-      >
+      <button type="button" onClick={handleAddClick}>
         {t.admin.characterForm.addCharacter}
       </button>
     </div>

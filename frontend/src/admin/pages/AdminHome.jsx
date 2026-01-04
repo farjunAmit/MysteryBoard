@@ -90,7 +90,8 @@ function AdminHome() {
               borderRadius: 10,
               padding: 20,
               minWidth: 320,
-              maxWidth: 500,
+              maxHeight: "80vh",
+              overflow: "auto",
               boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
             }}
             onClick={(e) => e.stopPropagation()}
