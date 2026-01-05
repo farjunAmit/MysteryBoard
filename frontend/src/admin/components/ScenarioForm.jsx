@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CharacterForm from "./CharacterForm";
+import CharacterListForForms from "./CharacterListForForms";
 import FamilyForm from "./FamilyForm";
 import FamilyFormInput from "./FamilyFormInput";
 import { texts as t } from "../../texts";
@@ -57,6 +58,10 @@ export default function ScenarioForm({ onCancel, onCreated }) {
       payload.characters = characters;
     } else if (mode === "groups") {
       // Todo: validate groups and characters inside
+      if (groups.length === 0) {
+        setError(t.admin.scenarioForm.validation.groupsRequired || "At least one family is required");
+        return;
+      }
       payload.groups = groups;
     }
 
@@ -207,23 +212,10 @@ export default function ScenarioForm({ onCancel, onCreated }) {
             onAdd={(char) => setCharacters((prev) => [...prev, char])}
           />
 
-          <ul>
-            {characters.map((c) => (
-              <li key={c.id}>
-                {c.name}{" "}
-                {c.required
-                  ? t.admin.scenarioForm.characterList.requiredTag
-                  : ""}{" "}
-                - {c.traits.join(", ")}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCharacter(c.id)}
-                >
-                  {t.common.actions.delete}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <CharacterListForForms
+            characters={characters}
+            onRemove={handleRemoveCharacter}
+          />
         </>
       )}
 
@@ -272,13 +264,16 @@ const styles = {
   modeSection: {
     marginBottom: 16,
     padding: 12,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 6,
+    backgroundColor: "#13212E",
+    border: "1px solid #1F3448",
+    borderRadius: 12,
+    color: "#EDEDED",
   },
   modeLabel: {
     display: "block",
     marginBottom: 8,
-    fontWeight: "bold",
+    fontWeight: 800,
+    color: "#B8B8B8",
   },
   modeOptions: {
     display: "flex",
@@ -287,67 +282,71 @@ const styles = {
   modeOption: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
+    color: "#EDEDED",
   },
   formGroup: {
     marginBottom: 12,
   },
   label: {
     display: "block",
-    marginBottom: 4,
+    marginBottom: 6,
+    color: "#B8B8B8",
+    fontSize: 13,
   },
   input: {
     width: "100%",
-    padding: 6,
-    borderRadius: 4,
-    border: "1px solid #ccc",
+    padding: "10px 12px",
+    borderRadius: 12,
+    border: "1px solid #1F3448",
+    backgroundColor: "#13212E",
+    color: "#EDEDED",
+    outline: "none",
   },
   textarea: {
     width: "100%",
-    padding: 6,
-    borderRadius: 4,
-    border: "1px solid #ccc",
+    padding: "10px 12px",
+    borderRadius: 12,
+    border: "1px solid #1F3448",
+    backgroundColor: "#13212E",
+    color: "#EDEDED",
+    outline: "none",
+    resize: "vertical",
   },
   playerCountsRow: {
     display: "flex",
-    gap: 8,
+    gap: 20,
     marginBottom: 12,
   },
   playerCountCol: {
     flex: 1,
   },
-  familiesPlaceholder: {
-    marginBottom: 16,
-    padding: 12,
-    border: "2px dashed #ccc",
-    borderRadius: 6,
-  },
-  placeholderText: {
-    marginBottom: 12,
-    fontStyle: "italic",
-    color: "#666",
-  },
   error: {
-    color: "red",
+    color: "#E35B5B",
     marginBottom: 12,
+    fontWeight: 700,
   },
   buttonContainer: {
     marginTop: 16,
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: 10,
   },
   cancelButton: {
-    padding: "6px 12px",
-    borderRadius: 6,
-    border: "1px solid #ccc",
+    padding: "10px 14px",
+    borderRadius: 12,
+    border: "1px solid #1F3448",
     cursor: "pointer",
-    backgroundColor: "#eee",
-    marginRight: 12,
+    backgroundColor: "transparent",
+    color: "#EDEDED",
   },
   submitButton: {
-    padding: "6px 12px",
-    borderRadius: 6,
-    border: "none",
+    padding: "10px 14px",
+    borderRadius: 12,
+    border: "1px solid #C9A24D",
     cursor: "pointer",
-    backgroundColor: "#007bff",
-    color: "white",
+    backgroundColor: "#C9A24D",
+    color: "#0B0F14",
+    fontWeight: 800,
   },
 };
