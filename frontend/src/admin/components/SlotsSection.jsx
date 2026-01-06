@@ -10,9 +10,21 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
   if (scenario.mode === "characters") {
     return (
       <div className="slots-section__grid">
-        {session.slots.map((slot) => (
-          <SlotCard key={slot.slotIndex} slot={slot} busy={busy} onSetPhoto={onSetPhoto} />
-        ))}
+        {session.slots.map((slot) => {
+          const charName =
+            (scenario.characters || []).find((c) => String(c._id) === String(slot.characterId))?.name ||
+            String(slot.characterId);
+
+          return (
+            <SlotCard
+              key={slot.slotIndex}
+              slot={slot}
+              characterName={charName}
+              busy={busy}
+              onSetPhoto={onSetPhoto}
+            />
+          );
+        })}
       </div>
     );
   }
