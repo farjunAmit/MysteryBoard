@@ -36,6 +36,11 @@ export const admin = {
       charactersMustMatchMax:
         "Number of characters must match the maximum number of players.",
     },
+    mode: {
+      label: "Game Mode",
+      standard: "Standard Mode",
+      families: "Families Mode",
+    },
   },
 
   adminHome: {
@@ -156,5 +161,15 @@ export const admin = {
     registerLink: "Register here",
     loginLink: "Login here",
     authError: "Authentication failed. Please try again.",
-  }
+  },
+
+  familyForm: {
+    familyNameLabel: "Family Name",
+    familyInfoLabel: "Family Info (optional)",
+    familyNamePlaceholder: "e.g. The Smiths",
+    familyInfoPlaceholder: "e.g. They own the mansion...",
+    addFamily: "+ Add Family",
+    noCharactersAdded: "No characters added yet",
+    familyNameRequired: "Family name is required",
+  },
 };

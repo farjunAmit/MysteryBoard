@@ -1,10 +1,20 @@
 // src/pages/AdminLiveSession.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import { texts as t } from "../../texts";
+import { adminTheme, createAdminStyles } from "../ui/adminTheme";
+import SessionMetaInfo from "../components/SessionMetaInfo";
+import PlayModeSelector from "../components/PlayModeSelector";
+import DesiredPlayersSelector from "../components/DesiredPlayersSelector";
+import SlotsSection from "../components/SlotsSection";
+import CharacterSection from "../components/CharacterSection";
+import GroupsSection from "../components/GroupsSection";
 
 export default function AdminLiveSession() {
+  const theme = adminTheme;
+  const styles = useMemo(() => createAdminStyles(theme), []);
+
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
@@ -14,6 +24,7 @@ export default function AdminLiveSession() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const sessionId = session?.id ?? session?._id;
+
   useEffect(() => {
     let cancelled = false;
 
@@ -38,14 +49,30 @@ export default function AdminLiveSession() {
   }, [id]);
 
   if (!session || !scenario) {
-    return <div style={{ padding: 16 }}>{t.common.status.loading}</div>;
+    return <div style={styles.page}>{t.common.status.loading}</div>;
   }
 
-  const chars = scenario.characters || [];
-  const mandatoryChars = chars.filter((c) => c.required);
-  const optionalChars = chars.filter((c) => !c.required);
+  let mandatoryChars = [];
+  let optionalChars = [];
+
+  if (scenario.mode === "characters") {
+    const chars = scenario.characters || [];
+    mandatoryChars = chars.filter((c) => c.required);
+    optionalChars = chars.filter((c) => !c.required);
+  } else if (scenario.mode === "groups") {
+    (scenario.groups || []).forEach((group) => {
+      const mandatory = (group.characters || []).filter((c) => c.required);
+      const optional = (group.characters || []).filter((c) => !c.required);
+      mandatoryChars.push(...mandatory);
+      optionalChars.push(...optional);
+    });
+  }
+
   const currentPlayers = session.slots?.length ?? 0;
   const canAddMore = currentPlayers < desiredPlayers;
+  const allPhotosPresent =
+    (session.slots || []).length > 0 &&
+    (session.slots || []).every((s) => Boolean(s.photoUrl));
 
   async function addOptional(characterId) {
     try {
@@ -108,267 +135,64 @@ export default function AdminLiveSession() {
     await savePhoto(slot.slotIndex, trimmed);
   }
 
-  const allPhotosPresent =
-    (session.slots || []).length > 0 &&
-    (session.slots || []).every((s) => Boolean(s.photoUrl));
-  const canPlay = session.phase === "setup" && allPhotosPresent && !busy;
-
   return (
-    <div style={{ padding: 16, fontFamily: "sans-serif" }}>
-      <h2>{t.admin.liveSession.title}</h2>
-
-      {error && (
-        <div
-          style={{
-            marginBottom: 12,
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #f5c2c7",
-            background: "#f8d7da",
-            color: "#842029",
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      <div
-        style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}
-      >
-        <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>{t.admin.liveSession.meta.sessionId}:</strong> {sessionId}
-        </div>
-        <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>{t.admin.liveSession.meta.phase}:</strong> {session.phase}
-        </div>
-        <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>{t.admin.liveSession.meta.players}:</strong>{" "}
-          {session.playerCount}
-        </div>
-        <div style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8 }}>
-          <strong>{t.admin.liveSession.meta.slots}:</strong>{" "}
-          {session.slots?.length ?? 0}
-        </div>
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>{t.admin.liveSession.title}</h1>
       </div>
+
+      {error && <div style={styles.error}>{error}</div>}
+
+      <SessionMetaInfo
+        sessionName={scenario.name}
+        phase={session.phase}
+        playerCount={session.playerCount}
+        slotsCount={session.slots?.length ?? 0}
+      />
 
       {session.phase === "setup" && (
-        <div
-          style={{
-            display: "flex",
-            gap: 12,
-            flexWrap: "wrap",
-            alignItems: "center",
-            marginBottom: 12,
-            padding: 12,
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            background: "#fafafa",
-          }}
-        >
-          <strong>{t.admin.liveSession.play.label}</strong>
-
-          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input
-              type="radio"
-              name="revealMode"
-              value="slow"
-              checked={mode === "slow"}
-              onChange={() => setMode("slow")}
-              disabled={busy}
-            />
-            {t.admin.liveSession.play.modes.slow}
-          </label>
-
-          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input
-              type="radio"
-              name="revealMode"
-              value="fast"
-              checked={mode === "fast"}
-              onChange={() => setMode("fast")}
-              disabled={busy}
-            />
-            {t.admin.liveSession.play.modes.fast}
-          </label>
-
-          <button
-            type="button"
-            onClick={startSession}
-            disabled={!canPlay}
-            style={{
-              padding: "8px 14px",
-              cursor: canPlay ? "pointer" : "not-allowed",
-              fontWeight: 700,
-            }}
-            title={t.admin.liveSession.play.startTitle}
-          >
-            {t.admin.liveSession.play.start}
-          </button>
-
-          <span style={{ opacity: 0.8 }}>{t.admin.liveSession.play.hint}</span>
-        </div>
+        <PlayModeSelector
+          mode={mode}
+          onModeChange={setMode}
+          onStart={startSession}
+          disabled={session.phase !== "setup"}
+          allPhotosPresent={allPhotosPresent}
+          busy={busy}
+        />
       )}
 
-      <div
-        style={{
-          marginBottom: 12,
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-        }}
-      >
-        <strong>{t.admin.liveSession.desiredPlayers.label}</strong>
+      <DesiredPlayersSelector
+        desiredPlayers={desiredPlayers}
+        onDesiredPlayersChange={setDesiredPlayers}
+        mandatoryCharsCount={mandatoryChars.length}
+        optionalCharsCount={optionalChars.length}
+        currentPlayers={currentPlayers}
+      />
 
-        <select
-          value={desiredPlayers}
-          onChange={(e) => setDesiredPlayers(Number(e.target.value))}
-        >
-          {Array.from(
-            { length: optionalChars.length + 1 },
-            (_, i) => mandatoryChars.length + i
-          ).map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+      <SlotsSection
+        session={session}
+        scenario={scenario}
+        busy={busy}
+        onSetPhoto={handleSetPhoto}
+      />
 
-        <span style={{ opacity: 0.8 }}>
-          {t.admin.liveSession.desiredPlayers.selected} {currentPlayers} /{" "}
-          {desiredPlayers}
-        </span>
-      </div>
-
-      {!session.slots || session.slots.length === 0 ? (
-        <p style={{ opacity: 0.8 }}>{t.admin.liveSession.states.noSlots}</p>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          }}
-        >
-          {session.slots.map((slot) => (
-            <div
-              key={slot.slotIndex}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 10,
-                padding: 12,
-                background: "#f8f8f8",
-              }}
-            >
-              <div>
-                <strong>{t.admin.liveSession.slots.slot}:</strong>{" "}
-                {slot.slotIndex}
-              </div>
-              <div style={{ wordBreak: "break-all" }}>
-                <strong>{t.admin.liveSession.slots.characterId}:</strong>{" "}
-                {slot.characterId}
-              </div>
-              <div style={{ marginTop: 8 }}>
-                <strong>{t.admin.liveSession.slots.photo}:</strong>{" "}
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: 12,
-                    color: slot.photoUrl ? "green" : "crimson",
-                  }}
-                >
-                  {slot.photoUrl
-                    ? t.admin.liveSession.slots.photoOk
-                    : t.admin.liveSession.slots.photoMissing}
-                </div>
-              </div>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => handleSetPhoto(slot)}
-              >
-                {t.admin.liveSession.slots.setPhoto}
-              </button>
-            </div>
-          ))}
-        </div>
+      {scenario.mode === "characters" && (
+        <CharacterSection
+          scenario={scenario}
+          session={session}
+          canAddMore={canAddMore}
+          onAddCharacter={addOptional}
+        />
       )}
 
-      <div
-        style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}
-      >
-        <div
-          style={{
-            flex: 1,
-            minWidth: 240,
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            padding: 12,
-          }}
-        >
-          <strong>{t.admin.liveSession.characters.mandatory}</strong>
-          <ul>
-            {mandatoryChars.map((c) => (
-              <li key={c._id}>{c.name}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            minWidth: 240,
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            padding: 12,
-          }}
-        >
-          <strong>{t.admin.liveSession.characters.optional}</strong>
-          <ul style={{ paddingInlineStart: 18 }}>
-            {optionalChars.map((c) => {
-              const isPicked = (session.slots || []).some(
-                (s) => String(s.characterId) === String(c._id)
-              );
-              const disabled = isPicked || !canAddMore;
-
-              return (
-                <li
-                  key={c._id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 6,
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => addOptional(c._id)}
-                    disabled={disabled}
-                    style={{
-                      width: 28,
-                      height: 28,
-                      cursor: disabled ? "not-allowed" : "pointer",
-                    }}
-                    title={
-                      isPicked
-                        ? t.admin.liveSession.tooltips.alreadyPicked
-                        : !canAddMore
-                        ? t.admin.liveSession.tooltips.reachedLimit
-                        : t.admin.liveSession.tooltips.add
-                    }
-                  >
-                    +
-                  </button>
-
-                  <span style={{ opacity: isPicked ? 0.6 : 1 }}>
-                    {c.name} {isPicked ? `(${t.admin.liveSession.picked})` : ""}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
+      {scenario.mode === "groups" && (
+        <GroupsSection
+          scenario={scenario}
+          session={session}
+          canAddMore={canAddMore}
+          onAddCharacter={addOptional}
+        />
+      )}
     </div>
   );
 }

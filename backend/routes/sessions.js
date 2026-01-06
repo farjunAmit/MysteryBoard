@@ -23,7 +23,19 @@ router.post("/", requireAuth, async (req, res) => {
       return res.status(404).json({ message: "Scenario not found" });
     }
 
-    const mandatory = (scenario.characters || []).filter((c) => c.required);
+    let mandatory = [];
+
+    if (scenario.mode === "characters") {
+      mandatory = (scenario.characters || []).filter((c) => c.required);
+    } else if (scenario.mode === "groups") {
+      // Extract mandatory characters from all groups
+      (scenario.groups || []).forEach((group) => {
+        const groupMandatory = (group.characters || []).filter(
+          (c) => c.required
+        );
+        mandatory.push(...groupMandatory);
+      });
+    }
 
     const playerCount = mandatory.length;
 
@@ -35,7 +47,7 @@ router.post("/", requireAuth, async (req, res) => {
 
     const session = await GameSession.create({
       scenarioId: scenario._id,
-      ownerId: req.user.id, 
+      ownerId: req.user.id,
       phase: "setup",
       playerCount,
       slots,
@@ -44,6 +56,17 @@ router.post("/", requireAuth, async (req, res) => {
     return res.status(201).json(session);
   } catch (err) {
     console.error("Create session error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET /api/sessions/all
+router.get("/all", requireAuth, async (req, res) => {
+  try {
+    const sessions = await GameSession.find({ ownerId: req.user.id });
+    return res.json(sessions);
+  } catch (err) {
+    console.error("Get all sessions error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -222,9 +245,25 @@ router.post("/:id/slots", async (req, res) => {
     if (!scenario)
       return res.status(404).json({ message: "Scenario not found" });
 
-    const char = (scenario.characters || []).find(
-      (c) => String(c._id) === String(characterId)
-    );
+    let char = null;
+
+    if (scenario.mode === "characters") {
+      char = (scenario.characters || []).find(
+        (c) => String(c._id) === String(characterId)
+      );
+    } else if (scenario.mode === "groups") {
+      // Search for character in all groups
+      for (const group of scenario.groups || []) {
+        char = (group.characters || []).find(
+          (c) => String(c._id) === String(characterId)
+        );
+        if (char) break;
+      }
+    }
+
+    if (!char) {
+      return res.status(400).json({ message: "characterId not in scenario" });
+    }
     if (!char) {
       return res.status(400).json({ message: "characterId not in scenario" });
     }

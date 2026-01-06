@@ -43,20 +43,22 @@ export default function CharacterCard({ character, isRevealed }) {
 
         {/* Name + hint */}
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 16 }}>
-            {isRevealed
-              ? character.name
-              : texts.client.characterCard.hiddenCharacterName}
-          </div>
-
-          {isRevealed && character.roleHint && (
-            <div style={{ fontSize: 13, color: "#6b7280" }}>
-              {character.roleHint}
-            </div>
+          {isRevealed && (
+            <>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>
+                {character.name}
+              </div>
+              {character.roleHint && (
+                <div style={{ fontSize: 13, color: "#6b7280" }}>
+                  {character.roleHint}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
+      {/* Traits (only when revealed) */}
       {isRevealed &&
         Array.isArray(character.traits) &&
         character.traits.length > 0 && (

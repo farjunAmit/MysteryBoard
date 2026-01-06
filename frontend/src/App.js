@@ -2,8 +2,6 @@
 import AdminHome from "./admin/pages/AdminHome";
 import AdminLiveSession from "./admin/pages/AdminLiveSession";
 import AdminSessionControl from "./admin/pages/AdminSessionControl";
-import AdminLogin from "./admin/pages/AdminLogin";
-import AdminRegister from "./admin/pages/AdminRegister";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import ClientJoin from "./client/pages/ClientJoin";
 import ClientScreen from "./client/pages/ClientScreen";
@@ -12,9 +10,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*Admin_User*/}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/register" element={<AdminRegister />} />
         {/* Default */}
         <Route path="/" element={<Navigate to="/client/join" replace />} />
 

@@ -12,6 +12,8 @@ export default function ClientScreen() {
   });
 
   const characters = data?.characters ?? [];
+  const families = data?.families ?? [];
+  const scenarioMode = data?.scenarioMode ?? "characters";
   const revealMode = (data?.reveal?.mode ?? "slow").toLowerCase();
   const revealedCount = data?.reveal?.revealedCount ?? 0;
   const latestChat = data?.latestChat;
@@ -71,6 +73,8 @@ export default function ClientScreen() {
 
       <CharactersGrid
         characters={characters}
+        families={families}
+        scenarioMode={scenarioMode}
         isRevealedAtIndex={isRevealedAtIndex}
       />
 

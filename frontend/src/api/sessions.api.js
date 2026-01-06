@@ -6,6 +6,10 @@ export const SessionsApi = {
     return http(`${API_PATHS.sessions}/${sessionId}`);
   },
 
+  getAll() {
+    return httpAuth(`${API_PATHS.sessions}/all`);
+  },
+
   create(scenarioId) {
     return httpAuth(API_PATHS.sessions, {
       method: "POST",

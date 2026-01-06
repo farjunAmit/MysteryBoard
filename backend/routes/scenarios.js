@@ -18,8 +18,16 @@ router.get("/", requireAuth, async (req, res) => {
 // POST /api/scenarios
 router.post("/", requireAuth, async (req, res) => {
   try {
-    const { name, description, minPlayers, maxPlayers, characters, imageUrl } =
-      req.body;
+    const {
+      name,
+      description,
+      minPlayers,
+      maxPlayers,
+      characters,
+      groups,
+      mode,
+      imageUrl,
+    } = req.body;
     const min = Number(minPlayers);
     const max = Number(maxPlayers);
 
@@ -67,6 +75,8 @@ router.post("/", requireAuth, async (req, res) => {
       minPlayers: Number(minPlayers),
       maxPlayers: Number(maxPlayers),
       characters: characters ?? [],
+      mode: mode || "characters",
+      groups: groups || [],
       imageUrl,
       ownerId: req.user.id,
     });
