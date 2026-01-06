@@ -1,4 +1,20 @@
 export const admin = {
+  home: {
+    title: "Admin",
+    createScenarioButton: "+ Create Scenario",
+    sessionsSection: "Sessions",
+    scenariosSection: "Scenarios",
+    noSessionsMessage: "No sessions running right now",
+    noScenariosMessage: "No scenarios created yet",
+    createScenarioModal: "Create Scenario",
+    confirmDeleteScenario: "Delete scenario?",
+    confirmDeleteSession: "Delete session?",
+    errors: {
+      loadScenarios: "Failed to load scenarios: ",
+      loadSessions: "Failed to load sessions: ",
+      deleteSession: "Failed to delete session",
+    },
+  },
   characterCard: {
     revealedTraits: "Revealed Traits",
     noTraitsRevealed: "No traits revealed yet.",

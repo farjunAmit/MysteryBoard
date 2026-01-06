@@ -4,7 +4,6 @@ import "../styles/components/SessionCard.css";
 export default function SessionCard({
   session,
   scenario,
-  theme,
   onGoToSession,
   onDeleteSession,
 }) {

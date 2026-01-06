@@ -1,38 +1,21 @@
-export default function Modal({ theme, title, onClose, children }) {
-  const overlay = {
-    position: "fixed",
-    inset: 0,
-    background: theme.colors.overlay,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-  };
+import "../styles/ui/Modal.css";
 
-  const box = {
-    background: theme.colors.surface,
-    border: `1px solid ${theme.colors.border}`,
-    borderRadius: 16,
-    width: "min(900px, 95%)",
-    maxHeight: "90vh",
-    overflow: "auto",
-  };
-
+export default function Modal({ title, onClose, children }) {
   return (
-    <div style={overlay} onClick={onClose}>
-      <div style={box} onClick={(e) => e.stopPropagation()}>
-        <div
-          style={{
-            padding: 16,
-            borderBottom: `1px solid ${theme.colors.border}`,
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <strong>{title}</strong>
-          <button onClick={onClose}>✕</button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-header__title">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="modal-header__close"
+            title="Close"
+          >
+            ✕
+          </button>
         </div>
-        <div style={{ padding: 16 }}>{children}</div>
+        <div className="modal-content">{children}</div>
       </div>
     </div>
   );

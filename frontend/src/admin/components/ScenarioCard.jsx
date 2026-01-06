@@ -1,6 +1,6 @@
 import "../styles/components/ScenarioCard.css";
 
-export default function ScenarioCard({ scenario, theme, onStartLive, onDelete }) {
+export default function ScenarioCard({ scenario, onStartLive, onDelete }) {
   const playersText =
     scenario.minPlayers || scenario.maxPlayers
       ? `Players: ${scenario.minPlayers ?? "?"}–${scenario.maxPlayers ?? "?"}`

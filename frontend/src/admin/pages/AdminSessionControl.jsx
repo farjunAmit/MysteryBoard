@@ -5,6 +5,7 @@ import CharactersList from "../components/CharactersList";
 import SessionChat from "../components/SessionChat";
 import { texts as t } from "../../texts";
 import "../styles/pages/shared.css";
+import "../styles/components/JoinCodeBox.css";
 
 export default function AdminSessionControl() {
   const { id } = useParams();
@@ -123,25 +124,11 @@ export default function AdminSessionControl() {
 
       {error && <div className="error">{error}</div>}
 
-      <div
-        style={{
-          position: "fixed",
-          top: 12,
-          right: 12,
-          padding: 12,
-          border: "1px solid #1F3448",
-          borderRadius: 10,
-          backgroundColor: "#13212E",
-          zIndex: 1000,
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-        }}
-      >
-        <strong style={{ color: "#B8B8B8", fontSize: 11, fontWeight: 700 }}>
+      <div className="join-code-box">
+        <strong className="join-code-box__label">
           {t.admin.sessionControl.labels.joinCode}:
         </strong>
-        <span style={{ color: "#C9A24D", fontSize: 16, fontWeight: 800 }}>
+        <span className="join-code-box__value">
           {session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}
         </span>
       </div>
@@ -166,16 +153,7 @@ export default function AdminSessionControl() {
         <button
           type="button"
           onClick={handleEndSession}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 12,
-            border: "1px solid rgba(227,91,91,0.5)",
-            backgroundColor: "transparent",
-            color: "#E35B5B",
-            fontWeight: 800,
-            cursor: "pointer",
-            fontSize: 13,
-          }}
+          className="join-code-box__end-button"
         >
           {t.admin.sessionControl.actions.endSession}
         </button>
