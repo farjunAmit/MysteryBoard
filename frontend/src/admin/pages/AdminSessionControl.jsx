@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
+import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import CharactersList from "../components/CharactersList";
 import SessionChat from "../components/SessionChat";
 import { texts as t } from "../../texts";
 
 export default function AdminSessionControl() {
+  const theme = adminTheme;
+  const styles = useMemo(() => createAdminStyles(theme), []);
+
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
@@ -69,7 +73,7 @@ export default function AdminSessionControl() {
 
   if (!session || !scenario) {
     return (
-      <div style={{ padding: 16 }}>
+      <div style={styles.page}>
         {error ? error : t.common.status.loading}
       </div>
     );
@@ -121,26 +125,20 @@ export default function AdminSessionControl() {
   }
 
   return (
-    <div style={{ padding: 16, fontFamily: "sans-serif" }}>
-      <h2>{t.admin.sessionControl.title}</h2>
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>{t.admin.sessionControl.title}</h1>
+      </div>
 
-      <div
-        style={{
-          position: "fixed",
-          top: 12,
-          left: 12,
-          padding: "6px 10px",
-          border: "1px solid #444",
-          background: "#111",
-          color: "#fff",
-          zIndex: 1000,
-          fontSize: 14,
-        }}
-      >
-        {t.admin.sessionControl.labels.joinCode}:{" "}
-        <b>
+      {error && <div style={styles.error}>{error}</div>}
+
+      <div style={controlStyles.joinCodeBox}>
+        <strong style={controlStyles.joinCodeLabel}>
+          {t.admin.sessionControl.labels.joinCode}:
+        </strong>
+        <span style={controlStyles.joinCodeValue}>
           {session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}
-        </b>
+        </span>
       </div>
 
       <CharactersList
@@ -160,10 +158,50 @@ export default function AdminSessionControl() {
       />
 
       {session.phase === "running" && (
-        <button type="button" onClick={handleEndSession}>
+        <button
+          type="button"
+          onClick={handleEndSession}
+          style={controlStyles.endSessionButton}
+        >
           {t.admin.sessionControl.actions.endSession}
         </button>
       )}
     </div>
   );
 }
+
+const controlStyles = {
+  joinCodeBox: {
+    position: "fixed",
+    top: 12,
+    right: 12,
+    padding: 12,
+    border: "1px solid #1F3448",
+    borderRadius: 10,
+    backgroundColor: "#13212E",
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+  joinCodeLabel: {
+    color: "#B8B8B8",
+    fontSize: 11,
+    fontWeight: 700,
+  },
+  joinCodeValue: {
+    color: "#C9A24D",
+    fontSize: 16,
+    fontWeight: 800,
+  },
+  endSessionButton: {
+    padding: "10px 14px",
+    borderRadius: 12,
+    border: "1px solid rgba(227,91,91,0.5)",
+    backgroundColor: "transparent",
+    color: "#E35B5B",
+    fontWeight: 800,
+    cursor: "pointer",
+    fontSize: 13,
+  },
+};
