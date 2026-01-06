@@ -67,6 +67,12 @@ export default function AdminHome() {
     }
   }
 
+  async function handleScenarioCreate(scenario) {
+    const createdScenario = await ScenariosApi.create(scenario);
+    setScenarios((prev) => [...prev, createdScenario]);
+    setShowCreate(false);
+  }
+
   return (
     <div className="page">
       <div className="header">
@@ -119,10 +125,7 @@ export default function AdminHome() {
           onClose={() => setShowCreate(false)}
         >
           <ScenarioForm
-            onCreated={(s) => {
-              setScenarios((prev) => [...prev, s]);
-              setShowCreate(false);
-            }}
+            onCreated={handleScenarioCreate}
             onCancel={() => setShowCreate(false)}
           />
         </Modal>
