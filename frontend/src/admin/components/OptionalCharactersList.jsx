@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import { texts as t } from "../../texts";
 
 export default function OptionalCharactersList({
@@ -6,8 +8,11 @@ export default function OptionalCharactersList({
   canAddMore,
   onAddCharacter,
 }) {
+  const theme = adminTheme;
+  const styles = useMemo(() => createAdminStyles(theme), []);
+
   return (
-    <ul style={{ paddingInlineStart: 18, margin: "8px 0" }}>
+    <ul style={optionalStyles.list}>
       {(characters || [])
         .filter((c) => !c.required)
         .map((c) => {
@@ -17,22 +22,14 @@ export default function OptionalCharactersList({
           const disabled = isPicked || !canAddMore;
 
           return (
-            <li
-              key={c._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 6,
-              }}
-            >
+            <li key={c._id} style={optionalStyles.item}>
               <button
                 type="button"
                 onClick={() => onAddCharacter(c._id)}
                 disabled={disabled}
                 style={{
-                  width: 28,
-                  height: 28,
+                  ...optionalStyles.addButton,
+                  opacity: disabled ? 0.5 : 1,
                   cursor: disabled ? "not-allowed" : "pointer",
                 }}
                 title={
@@ -46,7 +43,12 @@ export default function OptionalCharactersList({
                 +
               </button>
 
-              <span style={{ opacity: isPicked ? 0.6 : 1 }}>
+              <span
+                style={{
+                  ...optionalStyles.characterName,
+                  opacity: isPicked ? 0.6 : 1,
+                }}
+              >
                 {c.name} {isPicked ? `(${t.admin.liveSession.picked})` : ""}
               </span>
             </li>
@@ -55,3 +57,35 @@ export default function OptionalCharactersList({
     </ul>
   );
 }
+
+const optionalStyles = {
+  list: {
+    listStyle: "none",
+    margin: "8px 0",
+    padding: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  },
+  item: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  addButton: {
+    width: 28,
+    height: 28,
+    minWidth: 28,
+    padding: 0,
+    borderRadius: 10,
+    border: "1px solid #C9A24D",
+    backgroundColor: "#C9A24D",
+    color: "#0B0F14",
+    fontWeight: 800,
+    fontSize: 16,
+  },
+  characterName: {
+    color: "#EDEDED",
+    fontSize: 13,
+  },
+};

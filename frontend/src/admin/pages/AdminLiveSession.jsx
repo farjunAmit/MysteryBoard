@@ -1,8 +1,9 @@
 // src/pages/AdminLiveSession.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import { texts as t } from "../../texts";
+import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import SessionMetaInfo from "../components/SessionMetaInfo";
 import PlayModeSelector from "../components/PlayModeSelector";
 import DesiredPlayersSelector from "../components/DesiredPlayersSelector";
@@ -11,6 +12,9 @@ import CharacterSection from "../components/CharacterSection";
 import GroupsSection from "../components/GroupsSection";
 
 export default function AdminLiveSession() {
+  const theme = adminTheme;
+  const styles = useMemo(() => createAdminStyles(theme), []);
+
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
@@ -45,7 +49,7 @@ export default function AdminLiveSession() {
   }, [id]);
 
   if (!session || !scenario) {
-    return <div style={{ padding: 16 }}>{t.common.status.loading}</div>;
+    return <div style={styles.page}>{t.common.status.loading}</div>;
   }
 
   let mandatoryChars = [];
@@ -132,26 +136,15 @@ export default function AdminLiveSession() {
   }
 
   return (
-    <div style={{ padding: 16, fontFamily: "sans-serif" }}>
-      <h2>{t.admin.liveSession.title}</h2>
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>{t.admin.liveSession.title}</h1>
+      </div>
 
-      {error && (
-        <div
-          style={{
-            marginBottom: 12,
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #f5c2c7",
-            background: "#f8d7da",
-            color: "#842029",
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div style={styles.error}>{error}</div>}
 
       <SessionMetaInfo
-        sessionId={sessionId}
+        sessionName={scenario.name}
         phase={session.phase}
         playerCount={session.playerCount}
         slotsCount={session.slots?.length ?? 0}

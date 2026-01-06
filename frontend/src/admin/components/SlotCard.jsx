@@ -1,41 +1,26 @@
 import { texts as t } from "../../texts";
 
-const styles = {
-  card: {
-    border: "1px solid #ddd",
-    borderRadius: 10,
-    padding: 12,
-    background: "#f8f8f8",
-  },
-  photoStatus: {
-    marginTop: 6,
-    fontSize: 12,
-  },
-};
-
 export default function SlotCard({ slot, characterName, busy, onSetPhoto }) {
   return (
-    <div style={styles.card} key={slot.slotIndex}>
-      <div>
-        <strong>{t.admin.liveSession.slots.slot}:</strong> {slot.slotIndex}
+    <div style={slotStyles.card}>
+      <div style={slotStyles.row}>
+        <strong style={slotStyles.label}>{t.admin.liveSession.slots.slot}:</strong>
+        <span style={slotStyles.value}>{slot.slotIndex}</span>
       </div>
 
-      {characterName ? (
-        <div style={{ wordBreak: "break-word" }}>
-          <strong>{t.admin.liveSession.slots.characterId}:</strong> {characterName}
-        </div>
-      ) : (
-        <div style={{ wordBreak: "break-all" }}>
-          <strong>{t.admin.liveSession.slots.characterId}:</strong> {slot.characterId}
-        </div>
-      )}
+      <div style={slotStyles.row}>
+        <strong style={slotStyles.label}>{t.admin.liveSession.slots.characterId}:</strong>
+        <span style={{ ...slotStyles.value, wordBreak: "break-word" }}>
+          {characterName || slot.characterId}
+        </span>
+      </div>
 
-      <div style={{ marginTop: 8 }}>
-        <strong>{t.admin.liveSession.slots.photo}:</strong>
+      <div style={slotStyles.photoSection}>
+        <strong style={slotStyles.label}>{t.admin.liveSession.slots.photo}:</strong>
         <div
           style={{
-            ...styles.photoStatus,
-            color: slot.photoUrl ? "green" : "crimson",
+            ...slotStyles.photoStatus,
+            color: slot.photoUrl ? "#4CAF50" : "#E35B5B",
           }}
         >
           {slot.photoUrl
@@ -48,10 +33,59 @@ export default function SlotCard({ slot, characterName, busy, onSetPhoto }) {
         type="button"
         disabled={busy}
         onClick={() => onSetPhoto(slot)}
-        style={{ marginTop: 8 }}
+        style={{
+          ...slotStyles.setPhotoButton,
+          opacity: busy ? 0.55 : 1,
+          cursor: busy ? "not-allowed" : "pointer",
+        }}
       >
         {t.admin.liveSession.slots.setPhoto}
       </button>
     </div>
   );
 }
+
+const slotStyles = {
+  card: {
+    padding: 14,
+    border: "1px solid #1F3448",
+    borderRadius: 12,
+    backgroundColor: "#162635",
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  row: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+  label: {
+    color: "#B8B8B8",
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+  },
+  value: {
+    color: "#EDEDED",
+    fontSize: 13,
+  },
+  photoSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  },
+  photoStatus: {
+    fontSize: 12,
+    fontWeight: 700,
+  },
+  setPhotoButton: {
+    padding: "10px 14px",
+    borderRadius: 12,
+    border: "1px solid #C9A24D",
+    backgroundColor: "#C9A24D",
+    color: "#0B0F14",
+    fontWeight: 800,
+    fontSize: 13,
+  },
+};
