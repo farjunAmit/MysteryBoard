@@ -60,6 +60,17 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/sessions/all
+router.get("/all", requireAuth, async (req, res) => {
+  try {
+    const sessions = await GameSession.find({ ownerId: req.user.id });
+    return res.json(sessions);
+  } catch (err) {
+    console.error("Get all sessions error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 // GET /api/sessions/join/:code
 router.get("/join/:code", async (req, res) => {
   const code = (req.params.code || "").toUpperCase().trim();
