@@ -1,0 +1,100 @@
+.session-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.session-card__image-container {
+  width: 100%;
+  height: 160px;
+  background-color: var(--color-bg-input);
+  overflow: hidden;
+}
+
+.session-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.session-card__no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.session-card__content {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.session-card__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-black);
+  color: var(--color-text-primary);
+}
+
+.session-card__phase-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.session-card__phase-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-black);
+}
+
+.session-card__phase-value {
+  color: var(--color-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+  text-transform: uppercase;
+}
+
+.session-card__button-group {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.session-card__button {
+  flex: 1;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-black);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.session-card__button-primary {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+.session-card__button-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.session-card__button-danger {
+  border-color: var(--color-danger-light);
+  background-color: transparent;
+  color: var(--color-danger);
+}
+
+.session-card__button-danger:hover {
+  background-color: rgba(227, 91, 91, 0.1);
+}

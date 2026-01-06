@@ -1,23 +1,5 @@
 import CharacterCard from "./CharacterCard";
-
-const styles = {
-  container: {
-    marginBottom: 24,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 800,
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottom: "2px solid #1F3448",
-    color: "#EDEDED",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-    gap: 16,
-  },
-};
+import "../styles/components/FamilyCard.css";
 
 export default function FamilyCard({
   family,
@@ -34,9 +16,9 @@ export default function FamilyCard({
   if (!familySlots.length) return null;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>{family.name}</div>
-      <div style={styles.grid}>
+    <div className="family-card">
+      <div className="family-card__header">{family.name}</div>
+      <div className="family-card__grid">
         {familySlots.map((slot) => {
           const character = (family.characters || []).find(
             (c) => String(c._id) === String(slot.characterId)

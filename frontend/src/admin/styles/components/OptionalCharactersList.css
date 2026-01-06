@@ -1,0 +1,50 @@
+.optional-characters-list {
+  list-style: none;
+  margin: var(--spacing-lg) 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.optional-characters-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.optional-characters-list__button {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+  font-weight: var(--font-weight-black);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optional-characters-list__button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.optional-characters-list__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optional-characters-list__name {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+.optional-characters-list__name--picked {
+  opacity: 0.6;
+}

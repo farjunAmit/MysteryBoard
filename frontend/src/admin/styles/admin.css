@@ -1,0 +1,72 @@
+/* ============================================
+   THEME VARIABLES
+   ============================================ */
+:root {
+  /* Colors - Primary */
+  --color-primary: #C9A24D;
+  --color-primary-dark: #A68140;
+  --color-primary-light: #D4B35F;
+
+  /* Colors - Danger */
+  --color-danger: #E35B5B;
+  --color-danger-light: rgba(227, 91, 91, 0.5);
+
+  /* Colors - Success */
+  --color-success: #4CAF50;
+
+  /* Colors - Background */
+  --color-bg-dark: #141d28;
+  --color-bg-card: #1c3348;
+  --color-bg-input: #13212E;
+  --color-bg-light: #1F3448;
+
+  /* Colors - Text */
+  --color-text-primary: #EDEDED;
+  --color-text-secondary: #B8B8B8;
+  --color-text-muted: #999;
+
+  /* Colors - Borders */
+  --color-border: #1F3448;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 6px;
+  --spacing-md: 8px;
+  --spacing-lg: 12px;
+  --spacing-xl: 14px;
+  --spacing-2xl: 16px;
+  --spacing-3xl: 20px;
+  --spacing-4xl: 24px;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+
+  /* Typography */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 28px;
+
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}

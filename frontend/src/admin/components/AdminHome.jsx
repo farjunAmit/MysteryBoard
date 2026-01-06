@@ -7,7 +7,6 @@ import { ScenariosApi } from "../../api/scenarios.api";
 import { SessionsApi } from "../../api/sessions.api";
 import SessionCard from "../components/SessionCard";
 import "../styles/pages/shared.css";
-import "../styles/pages/AdminHome.css";
 import { texts as t } from "../../texts";
 
 export default function AdminHome() {
@@ -21,12 +20,12 @@ export default function AdminHome() {
     ScenariosApi.getAll()
       .then(setScenarios)
       .catch((err) => {
-        setError("Failed to load scenarios: " + err.message);
+        setError(t.admin.home.errors.loadScenarios + err.message);
       });
     SessionsApi.getAll()
       .then(setSessions)
       .catch((err) => {
-        setError("Failed to load sessions: " + (err.response?.data?.message || err.message));
+        setError(t.admin.home.errors.loadSessions + (err.response?.data?.message || err.message));
       });
   }, []);
 
@@ -36,7 +35,7 @@ export default function AdminHome() {
   }
 
   async function deleteScenario(id) {
-    if (!window.confirm("Delete scenario?")) return;
+    if (!window.confirm(t.admin.home.confirmDeleteScenario)) return;
     await ScenariosApi.remove(id);
     setScenarios((prev) => prev.filter((s) => s.id !== id));
   }
@@ -57,64 +56,67 @@ export default function AdminHome() {
   }
 
   async function onDeleteSession(id) {
-    if (!window.confirm("Delete session?")) return;
+    if (!window.confirm(t.admin.home.confirmDeleteSession)) return;
 
     try {
       await SessionsApi.delete(id);
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch (e) {
-      alert("Failed to delete session");
+      alert(t.admin.home.errors.deleteSession);
     }
   }
 
   return (
     <div className="page">
       <div className="header">
-        <h1 className="title">Admin</h1>
+        <h1 className="title">{t.admin.home.title}</h1>
         <button
           className="button-primary"
           onClick={() => setShowCreate(true)}
         >
-          + Create Scenario
+          {t.admin.home.createScenarioButton}
         </button>
       </div>
 
-      <h2 className="section-title">Sessions</h2>
+      <h2 className="section-title">{t.admin.home.sessionsSection}</h2>
       {error && <div className="error">{error}</div>}
-      <div className="admin-home__grid">
+      <div className="grid">
         {sessions.length > 0 ? (
           sessions.map((s) => (
             <SessionCard
               key={s.id}
               session={s}
               scenario={findScenarioById(s.scenarioId)}
+              theme={null}
               onGoToSession={onGoToSession}
               onDeleteSession={onDeleteSession}
             />
           ))
         ) : (
-          <p className="empty-state">No sessions running right now</p>
+          <p className="empty-state">{t.admin.home.noSessionsMessage}</p>
         )}
       </div>
 
-      <h2 className="section-title">Scenarios</h2>
+      <h2 className="section-title">{t.admin.home.scenariosSection}</h2>
       <div className="grid">
         {scenarios.length > 0 ? (
           scenarios.map((s) => (
             <ScenarioCard
               key={s.id}
               scenario={s}
+              theme={null}
               onStartLive={startLive}
               onDelete={deleteScenario}
             />
           ))
         ) : (
-          <p className="empty-state">No scenarios created yet</p>
+          <p className="empty-state">{t.admin.home.noScenariosMessage}</p>
         )}
       </div>
 
       {showCreate && (
         <Modal
+          theme={null}
           title={t.admin.home.createScenarioModal}
           onClose={() => setShowCreate(false)}
         >

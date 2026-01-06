@@ -1,19 +1,15 @@
-import { useMemo } from "react";
-import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import SlotCard from "./SlotCard";
 import { texts as t } from "../../texts";
+import "../styles/components/SlotsSection.css";
 
 export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
-  const theme = adminTheme;
-  const styles = useMemo(() => createAdminStyles(theme), []);
-
   if (!session.slots || session.slots.length === 0) {
-    return <p style={slotStyles.emptyMessage}>{t.admin.liveSession.states.noSlots}</p>;
+    return <p className="slots-section__empty-message">{t.admin.liveSession.states.noSlots}</p>;
   }
 
   if (scenario.mode === "characters") {
     return (
-      <div style={slotStyles.grid}>
+      <div className="slots-section__grid">
         {session.slots.map((slot) => (
           <SlotCard key={slot.slotIndex} slot={slot} busy={busy} onSetPhoto={onSetPhoto} />
         ))}
@@ -23,7 +19,7 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
 
   // Groups mode
   return (
-    <div style={slotStyles.groupsContainer}>
+    <div className="slots-section__groups-container">
       {(scenario.groups || []).map((group) => {
         const groupChars = group.characters || [];
         const slotsInThisFamily = (session.slots || []).filter((s) =>
@@ -31,15 +27,15 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
         );
 
         return (
-          <div key={group._id} style={slotStyles.groupCard}>
-            <h4 style={slotStyles.groupTitle}>{group.name}</h4>
+          <div key={group._id} className="slots-section__group-card">
+            <h4 className="slots-section__group-title">{group.name}</h4>
 
-            {group.sharedInfo && <p style={slotStyles.groupInfo}>{group.sharedInfo}</p>}
+            {group.sharedInfo && <p className="slots-section__group-info">{group.sharedInfo}</p>}
 
             {slotsInThisFamily.length === 0 ? (
-              <div style={slotStyles.emptyMessage}>{t.admin.liveSession.states.noSlots}</div>
+              <div className="slots-section__empty-message">{t.admin.liveSession.states.noSlots}</div>
             ) : (
-              <div style={slotStyles.groupGrid}>
+              <div className="slots-section__group-grid">
                 {slotsInThisFamily.map((slot) => {
                   const charName =
                     groupChars.find((c) => String(c._id) === String(slot.characterId))?.name ||
@@ -63,46 +59,3 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
     </div>
   );
 }
-
-const slotStyles = {
-  grid: {
-    display: "grid",
-    gap: 12,
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    marginBottom: 16,
-  },
-  groupsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-    marginBottom: 16,
-  },
-  groupCard: {
-    padding: 14,
-    border: "1px solid #1F3448",
-    borderRadius: 12,
-    backgroundColor: "#162635",
-  },
-  groupTitle: {
-    margin: "0 0 8px 0",
-    fontSize: 16,
-    fontWeight: 800,
-    color: "#EDEDED",
-  },
-  groupInfo: {
-    margin: "0 0 12px 0",
-    fontSize: 12,
-    color: "#B8B8B8",
-    fontStyle: "italic",
-  },
-  groupGrid: {
-    display: "grid",
-    gap: 12,
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  },
-  emptyMessage: {
-    fontSize: 12,
-    color: "#B8B8B8",
-    fontStyle: "italic",
-  },
-};
