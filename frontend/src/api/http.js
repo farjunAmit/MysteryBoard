@@ -1,6 +1,6 @@
 // src/api/http.js
 import { getToken } from "../auth/authStorage.js";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config/api.js";
 
 function buildUrl(path) {
   return `${API_BASE_URL}${path}`;
