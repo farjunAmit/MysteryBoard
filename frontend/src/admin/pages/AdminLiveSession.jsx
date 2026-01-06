@@ -3,23 +3,20 @@ import { useEffect, useMemo, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
 import { texts as t } from "../../texts";
-import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import SessionMetaInfo from "../components/SessionMetaInfo";
 import PlayModeSelector from "../components/PlayModeSelector";
 import DesiredPlayersSelector from "../components/DesiredPlayersSelector";
 import SlotsSection from "../components/SlotsSection";
 import CharacterSection from "../components/CharacterSection";
 import GroupsSection from "../components/GroupsSection";
+import "../styles/pages/shared.css";
 
 export default function AdminLiveSession() {
-  const theme = adminTheme;
-  const styles = useMemo(() => createAdminStyles(theme), []);
-
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
   const [desiredPlayers, setDesiredPlayers] = useState(0);
-  const [mode, setMode] = useState("slow"); // fast | slow
+  const [mode, setMode] = useState("slow");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -49,7 +46,7 @@ export default function AdminLiveSession() {
   }, [id]);
 
   if (!session || !scenario) {
-    return <div style={styles.page}>{t.common.status.loading}</div>;
+    return <div className="page">{t.common.status.loading}</div>;
   }
 
   let mandatoryChars = [];
@@ -136,12 +133,12 @@ export default function AdminLiveSession() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>{t.admin.liveSession.title}</h1>
+    <div className="page">
+      <div className="header">
+        <h1 className="title">{t.admin.liveSession.title}</h1>
       </div>
 
-      {error && <div style={styles.error}>{error}</div>}
+      {error && <div className="error">{error}</div>}
 
       <SessionMetaInfo
         sessionName={scenario.name}

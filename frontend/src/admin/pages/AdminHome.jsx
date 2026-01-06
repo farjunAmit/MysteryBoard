@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ScenarioForm from "../components/ScenarioForm";
 import ScenarioCard from "../components/ScenarioCard";
 import Modal from "../ui/Modal";
-import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import { ScenariosApi } from "../../api/scenarios.api";
 import { SessionsApi } from "../../api/sessions.api";
 import SessionCard from "../components/SessionCard";
+import { adminTheme } from "../ui/adminTheme";
+import "../styles/pages/shared.css";
+import { texts as t } from "../../texts";
 
 export default function AdminHome() {
   const theme = adminTheme;
-  const styles = useMemo(() => createAdminStyles(theme), []);
 
   const [scenarios, setScenarios] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -69,20 +70,20 @@ export default function AdminHome() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Admin</h1>
+    <div className="page">
+      <div className="header">
+        <h1 className="title">Admin</h1>
         <button
-          style={styles.buttonPrimary}
+          className="button-primary"
           onClick={() => setShowCreate(true)}
         >
           + Create Scenario
         </button>
       </div>
 
-      <h2 style={styles.sectionTitle}>Sessions</h2>
-      {error && <div style={styles.error}>{error}</div>}
-      <div style={styles.grid}>
+      <h2 className="section-title">Sessions</h2>
+      {error && <div className="error">{error}</div>}
+      <div className="grid">
         {sessions.length > 0 ? (
           sessions.map((s) => (
             <SessionCard
@@ -95,12 +96,12 @@ export default function AdminHome() {
             />
           ))
         ) : (
-          <p style={styles.emptyState}>No sessions running right now</p>
+          <p className="empty-state">No sessions running right now</p>
         )}
       </div>
 
-      <h2 style={styles.sectionTitle}>Scenarios</h2>
-      <div style={styles.grid}>
+      <h2 className="section-title">Scenarios</h2>
+      <div className="grid">
         {scenarios.length > 0 ? (
           scenarios.map((s) => (
             <ScenarioCard
@@ -112,7 +113,7 @@ export default function AdminHome() {
             />
           ))
         ) : (
-          <p style={styles.emptyState}>No scenarios created yet</p>
+          <p className="empty-state">No scenarios created yet</p>
         )}
       </div>
 

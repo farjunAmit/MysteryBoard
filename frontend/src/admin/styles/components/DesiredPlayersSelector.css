@@ -1,0 +1,38 @@
+.desired-players-selector {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-card);
+}
+
+.desired-players-selector__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+}
+
+.desired-players-selector__select {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.desired-players-selector__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.desired-players-selector__info {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+}

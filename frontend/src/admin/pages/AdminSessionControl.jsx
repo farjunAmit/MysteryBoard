@@ -1,15 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { SessionsApi } from "../../api/sessions.api";
 import { useParams, useNavigate } from "react-router-dom";
-import { adminTheme, createAdminStyles } from "../ui/adminTheme";
 import CharactersList from "../components/CharactersList";
 import SessionChat from "../components/SessionChat";
 import { texts as t } from "../../texts";
+import "../styles/pages/shared.css";
 
 export default function AdminSessionControl() {
-  const theme = adminTheme;
-  const styles = useMemo(() => createAdminStyles(theme), []);
-
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
@@ -42,20 +39,15 @@ export default function AdminSessionControl() {
   }, [id]);
 
   useEffect(() => {
-    // Do nothing if session is not loaded yet
     if (!session?.id) return;
-
-    // Poll only while in the "reveal" phase
     if (session.phase !== "reveal") return;
 
     let cancelled = false;
 
     const intervalId = setInterval(async () => {
       try {
-        // Lightweight fetch – we only need the updated session state
         const updatedSession = await SessionsApi.getById(session.id);
 
-        // Avoid state updates after unmount / cleanup
         if (!cancelled) {
           setSession(updatedSession);
         }
@@ -64,7 +56,6 @@ export default function AdminSessionControl() {
       }
     }, 1500);
 
-    // Cleanup when leaving the reveal phase or unmounting the component
     return () => {
       cancelled = true;
       clearInterval(intervalId);
@@ -73,7 +64,7 @@ export default function AdminSessionControl() {
 
   if (!session || !scenario) {
     return (
-      <div style={styles.page}>
+      <div className="page">
         {error ? error : t.common.status.loading}
       </div>
     );
@@ -125,18 +116,32 @@ export default function AdminSessionControl() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>{t.admin.sessionControl.title}</h1>
+    <div className="page">
+      <div className="header">
+        <h1 className="title">{t.admin.sessionControl.title}</h1>
       </div>
 
-      {error && <div style={styles.error}>{error}</div>}
+      {error && <div className="error">{error}</div>}
 
-      <div style={controlStyles.joinCodeBox}>
-        <strong style={controlStyles.joinCodeLabel}>
+      <div
+        style={{
+          position: "fixed",
+          top: 12,
+          right: 12,
+          padding: 12,
+          border: "1px solid #1F3448",
+          borderRadius: 10,
+          backgroundColor: "#13212E",
+          zIndex: 1000,
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
+        <strong style={{ color: "#B8B8B8", fontSize: 11, fontWeight: 700 }}>
           {t.admin.sessionControl.labels.joinCode}:
         </strong>
-        <span style={controlStyles.joinCodeValue}>
+        <span style={{ color: "#C9A24D", fontSize: 16, fontWeight: 800 }}>
           {session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}
         </span>
       </div>
@@ -161,7 +166,16 @@ export default function AdminSessionControl() {
         <button
           type="button"
           onClick={handleEndSession}
-          style={controlStyles.endSessionButton}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 12,
+            border: "1px solid rgba(227,91,91,0.5)",
+            backgroundColor: "transparent",
+            color: "#E35B5B",
+            fontWeight: 800,
+            cursor: "pointer",
+            fontSize: 13,
+          }}
         >
           {t.admin.sessionControl.actions.endSession}
         </button>
@@ -169,39 +183,3 @@ export default function AdminSessionControl() {
     </div>
   );
 }
-
-const controlStyles = {
-  joinCodeBox: {
-    position: "fixed",
-    top: 12,
-    right: 12,
-    padding: 12,
-    border: "1px solid #1F3448",
-    borderRadius: 10,
-    backgroundColor: "#13212E",
-    zIndex: 1000,
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-  },
-  joinCodeLabel: {
-    color: "#B8B8B8",
-    fontSize: 11,
-    fontWeight: 700,
-  },
-  joinCodeValue: {
-    color: "#C9A24D",
-    fontSize: 16,
-    fontWeight: 800,
-  },
-  endSessionButton: {
-    padding: "10px 14px",
-    borderRadius: 12,
-    border: "1px solid rgba(227,91,91,0.5)",
-    backgroundColor: "transparent",
-    color: "#E35B5B",
-    fontWeight: 800,
-    cursor: "pointer",
-    fontSize: 13,
-  },
-};
