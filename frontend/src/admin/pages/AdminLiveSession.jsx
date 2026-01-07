@@ -81,25 +81,6 @@ export default function AdminLiveSession() {
     }
   }
 
-  async function savePhoto(slotIndex, photoUrl) {
-    try {
-      setBusy(true);
-      setError("");
-
-      const updatedSession = await SessionsApi.setSlotPhoto(
-        sessionId,
-        slotIndex,
-        photoUrl
-      );
-
-      setSession(updatedSession);
-    } catch (err) {
-      setError(err?.message || t.admin.liveSession.errors.savePhoto);
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function startSession() {
     try {
       setBusy(true);
@@ -118,18 +99,28 @@ export default function AdminLiveSession() {
   async function handleSetPhoto(slot) {
     if (busy) return;
 
-    const current = slot.photoUrl || "";
-    const url = window.prompt(
-      t.admin.liveSession.prompts.photoUrl(slot.slotIndex),
-      current
-    );
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
 
-    if (url == null) return;
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
 
-    const trimmed = url.trim();
-    if (!trimmed) return;
+      try {
+        setBusy(true);
+        setError("");
+        await SessionsApi.uploadSlotPhoto(sessionId, slot.slotIndex, file);
+        const updated = await SessionsApi.getById(sessionId);
+        setSession(updated);
+      } catch (err) {
+        setError(err?.message || t.admin.liveSession.errors.savePhoto);
+      } finally {
+        setBusy(false);
+      }
+    };
 
-    await savePhoto(slot.slotIndex, trimmed);
+    input.click();
   }
 
   return (

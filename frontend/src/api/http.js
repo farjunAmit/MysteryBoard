@@ -53,3 +53,25 @@ export async function httpAuth(path, options = {}) {
 
   return handleResponse(res);
 }
+
+export async function httpAuthFormData(path, formData, options = {}) {
+  const token = getToken();
+
+  const headers = {
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(buildUrl(path), {
+    ...options,
+    method: options.method || "POST",
+    headers,
+    body: formData,
+  });
+
+  return handleResponse(res);
+}
+
