@@ -4,6 +4,7 @@ import CharactersGrid from "../components/CharactersGrid";
 import { useClientSession } from "../hook/useClientSession";
 import { texts as t } from "../../texts";
 import { ClientSessionsApi } from "../../api/clientSessions.api";
+import "../styles/pages/ClientScreen.css";
 
 export default function ClientScreen() {
   const { sessionId } = useParams();
@@ -47,26 +48,28 @@ export default function ClientScreen() {
   return (
     <div
       onClick={handleScreenClick}
-      style={{ padding: 16, maxWidth: 1100, margin: "0 auto" }}
+      className="client-screen"
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          marginBottom: 14,
-        }}
-      >
+      <div className="client-screen__header">
         <div>
-          <h2 style={{ margin: 0 }}>
+          <h2 className="client-screen__title">
             {data.title ?? t.client.screen.defaultTitle}
           </h2>
 
-          <div style={{ color: "#6b7280", fontSize: 13 }}>
-            {t.client.screen.modeLabel} <b>{revealMode}</b> •{" "}
-            {t.client.screen.revealedLabel} <b>{revealedCount}</b> /{" "}
-            <b>{characters.length}</b>
-            {"  "}• phase: <b>{data.phase}</b>
+          <div className="client-screen__meta">
+            <span className="client-screen__meta-item">
+              <span className="client-screen__meta-label">{t.client.screen.modeLabel}</span>{" "}
+              <span className="client-screen__meta-value">{revealMode}</span>
+            </span>
+            <span className="client-screen__meta-item">
+              <span className="client-screen__meta-label">{t.client.screen.revealedLabel}</span>{" "}
+              <span className="client-screen__meta-value">{revealedCount}</span> /
+              <span className="client-screen__meta-value"> {characters.length}</span>
+            </span>
+            <span className="client-screen__meta-item">
+              <span className="client-screen__meta-label">phase:</span>{" "}
+              <span className="client-screen__meta-value">{data.phase}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -80,18 +83,11 @@ export default function ClientScreen() {
       />
 
       {latestChat && (
-        <div
-          style={{
-            marginTop: 16,
-            padding: 12,
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-          }}
-        >
-          <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>
-            Message
+        <div className="client-screen__message">
+          <div className="client-screen__message-label">
+            {t.client.screen.message || "Message"}
           </div>
-          <div style={{ fontSize: 16 }}>{latestChat.text}</div>
+          <div className="client-screen__message-text">{latestChat.text}</div>
         </div>
       )}
     </div>

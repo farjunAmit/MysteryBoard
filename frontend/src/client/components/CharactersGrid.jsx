@@ -1,13 +1,6 @@
 import CharacterCard from "./CharacterCard";
 import FamilyCard from "./FamilyCard";
-
-const styles = {
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: 12,
-  },
-};
+import "../styles/components/CharactersGrid.css";
 
 export default function CharactersGrid({
   sessionId,
@@ -19,7 +12,7 @@ export default function CharactersGrid({
   // Standard mode: flat layout
   if (scenarioMode === "characters") {
     return (
-      <div style={styles.grid}>
+      <div className="characters-grid">
         {characters.map((c, idx) => (
           <CharacterCard
             key={c.id}

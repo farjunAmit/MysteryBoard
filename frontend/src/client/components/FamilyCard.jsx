@@ -1,27 +1,5 @@
 import CharacterCard from "./CharacterCard";
-
-const styles = {
-  container: {
-    marginBottom: "24px",
-  },
-  header: {
-    fontSize: "18px",
-    fontWeight: "bold",
-    marginBottom: "12px",
-    paddingBottom: "8px",
-    borderBottom: "2px solid #e5e7eb",
-  },
-  sharedInfo: {
-    fontSize: "13px",
-    color: "#6b7280",
-    marginBottom: "12px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: 12,
-  },
-};
+import "../styles/components/FamilyCard.css";
 
 export default function FamilyCard({
   family,
@@ -31,12 +9,12 @@ export default function FamilyCard({
   isRevealedAtIndex,
 }) {
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>{family.name}</div>
+    <div className="family-card">
+      <div className="family-card__header">{family.name}</div>
       {family.sharedInfo && (
-        <div style={styles.sharedInfo}>{family.sharedInfo}</div>
+        <div className="family-card__shared-info">{family.sharedInfo}</div>
       )}
-      <div style={styles.grid}>
+      <div className="family-card__grid">
         {characters.map((c) => {
           const charIndex = allCharacters.indexOf(c);
           return (
