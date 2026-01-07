@@ -1,9 +1,10 @@
 import { texts as t } from "../../texts";
+import { API_BASE_URL } from "../../config/api";
 import "../styles/components/SlotCard.css";
 
 export default function SlotCard({ slot, characterName, busy, hasPhoto, onSetPhoto, sessionId }) {
   const photoUrl = sessionId && hasPhoto
-    ? `/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
+    ? `${API_BASE_URL}/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
     : null;
 
   return (

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { texts } from "../../texts";
+import { API_BASE_URL } from "../../config/api";
 import { SessionsApi } from "../../api/sessions.api";
 import "../styles/components/CharacterCard.css";
 
@@ -16,7 +17,7 @@ export default function CharacterCard({
   const [uploadError, setUploadError] = useState(null);
 
   const photoUrl = sessionId && slotIndex !== undefined
-    ? `/api/sessions/${sessionId}/slots/${slotIndex}/photo`
+    ? `${API_BASE_URL}/api/sessions/${sessionId}/slots/${slotIndex}/photo`
     : null;
 
   const handlePhotoClick = () => {

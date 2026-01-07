@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { texts as t } from "../../texts";
+import { API_BASE_URL } from "../../config/api";
 import "../styles/components/CharacterCard.css";
 
 function getRevealedTraitsForCharacter(events, characterId) {
@@ -23,7 +24,7 @@ export default function CharacterCard({
   const [selectedTrait, setSelectedTrait] = useState("");
 
   const photoUrl = sessionId && hasPhoto && slot?.slotIndex !== undefined
-    ? `/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
+    ? `${API_BASE_URL}/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
     : null;
 
   const revealedTraits = useMemo(
