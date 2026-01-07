@@ -65,9 +65,7 @@ export default function AdminSessionControl() {
 
   if (!session || !scenario) {
     return (
-      <div className="page">
-        {error ? error : t.common.status.loading}
-      </div>
+      <div className="page">{error ? error : t.common.status.loading}</div>
     );
   }
 
@@ -132,23 +130,23 @@ export default function AdminSessionControl() {
           {session?.joinCode || t.admin.sessionControl.labels.joinCodeMissing}
         </span>
       </div>
+      <div className="admin-session-control__content">
+        <CharactersList
+          scenario={scenario}
+          characters={scenario.mode === "groups" ? [] : scenario.characters}
+          groups={scenario.mode === "groups" ? scenario.groups : []}
+          slots={session.slots}
+          events={session.events}
+          scenarioMode={scenario.mode}
+          onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
+        />
 
-      <CharactersList
-        scenario={scenario}
-        characters={scenario.mode === "groups" ? [] : scenario.characters}
-        groups={scenario.mode === "groups" ? scenario.groups : []}
-        slots={session.slots}
-        events={session.events}
-        scenarioMode={scenario.mode}
-        onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
-      />
-
-      <SessionChat
-        disabled={session.phase !== "running"}
-        onSend={handleSendMessage}
-        onClear={handleClearMessage}
-      />
-
+        <SessionChat
+          disabled={session.phase !== "running"}
+          onSend={handleSendMessage}
+          onClear={handleClearMessage}
+        />
+      </div>
       {session.phase === "running" && (
         <button
           type="button"
