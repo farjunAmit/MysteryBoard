@@ -141,7 +141,7 @@ export default function AdminSessionControl() {
           slots={session.slots}
           events={session.events}
           scenarioMode={scenario.mode}
-          sessionId={session.id || session._id}
+          sessionId={session._id || session.id}
           photoStatus={photoStatus}
           onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
         />
