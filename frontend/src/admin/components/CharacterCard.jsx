@@ -16,9 +16,15 @@ export default function CharacterCard({
   character,
   slot,
   events,
+  sessionId,
+  hasPhoto,
   onRevealTrait,
 }) {
   const [selectedTrait, setSelectedTrait] = useState("");
+
+  const photoUrl = sessionId && hasPhoto && slot?.slotIndex !== undefined
+    ? `/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
+    : null;
 
   const revealedTraits = useMemo(
     () => getRevealedTraitsForCharacter(events, character._id),
@@ -34,9 +40,9 @@ export default function CharacterCard({
     <div className="character-card">
       <h3 className="character-card__name">{character.name}</h3>
 
-      {slot?.photoUrl && (
+      {photoUrl && (
         <img
-          src={slot.photoUrl}
+          src={photoUrl}
           alt={character.name}
           className="character-card__photo"
         />

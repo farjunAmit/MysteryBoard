@@ -10,6 +10,7 @@ const styles = {
 };
 
 export default function CharactersGrid({
+  sessionId,
   characters,
   families = [],
   scenarioMode = "characters",
@@ -23,6 +24,8 @@ export default function CharactersGrid({
           <CharacterCard
             key={c.id}
             character={c}
+            sessionId={sessionId}
+            slotIndex={idx}
             isRevealed={isRevealedAtIndex(idx)}
           />
         ))}
@@ -45,6 +48,7 @@ export default function CharactersGrid({
               family={family}
               characters={familyCharacters}
               allCharacters={characters}
+              sessionId={sessionId}
               isRevealedAtIndex={isRevealedAtIndex}
             />
           );

@@ -19,6 +19,7 @@ export default function AdminLiveSession() {
   const [mode, setMode] = useState("slow");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [photoStatus, setPhotoStatus] = useState(null);
   const navigate = useNavigate();
   const sessionId = session?.id ?? session?._id;
 
@@ -31,6 +32,10 @@ export default function AdminLiveSession() {
         const data = await SessionsApi.getFullById(id);
         if (!cancelled) {
           setSession(data.session);
+          const status = await SessionsApi.getPhotoStatus(
+            data.session._id || data.session.id
+          );
+          setPhotoStatus(status);
           setScenario(data.scenario);
           setDesiredPlayers(data.session.playerCount);
         }
@@ -67,9 +72,7 @@ export default function AdminLiveSession() {
 
   const currentPlayers = session.slots?.length ?? 0;
   const canAddMore = currentPlayers < desiredPlayers;
-  const allPhotosPresent =
-    (session.slots || []).length > 0 &&
-    (session.slots || []).every((s) => Boolean(s.photoUrl));
+  const allPhotosPresent = Boolean(photoStatus?.allPresent);
 
   async function addOptional(characterId) {
     try {
@@ -78,25 +81,6 @@ export default function AdminLiveSession() {
       setSession(updated);
     } catch (e) {
       setError(e?.message || t.admin.liveSession.errors.addCharacter);
-    }
-  }
-
-  async function savePhoto(slotIndex, photoUrl) {
-    try {
-      setBusy(true);
-      setError("");
-
-      const updatedSession = await SessionsApi.setSlotPhoto(
-        sessionId,
-        slotIndex,
-        photoUrl
-      );
-
-      setSession(updatedSession);
-    } catch (err) {
-      setError(err?.message || t.admin.liveSession.errors.savePhoto);
-    } finally {
-      setBusy(false);
     }
   }
 
@@ -118,18 +102,28 @@ export default function AdminLiveSession() {
   async function handleSetPhoto(slot) {
     if (busy) return;
 
-    const current = slot.photoUrl || "";
-    const url = window.prompt(
-      t.admin.liveSession.prompts.photoUrl(slot.slotIndex),
-      current
-    );
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
 
-    if (url == null) return;
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
 
-    const trimmed = url.trim();
-    if (!trimmed) return;
+      try {
+        setBusy(true);
+        setError("");
+        await SessionsApi.uploadSlotPhoto(sessionId, slot.slotIndex, file);
+        const status = await SessionsApi.getPhotoStatus(sessionId);
+        setPhotoStatus(status);
+      } catch (err) {
+        setError(err?.message || t.admin.liveSession.errors.savePhoto);
+      } finally {
+        setBusy(false);
+      }
+    };
 
-    await savePhoto(slot.slotIndex, trimmed);
+    input.click();
   }
 
   return (
@@ -170,6 +164,7 @@ export default function AdminLiveSession() {
         session={session}
         scenario={scenario}
         busy={busy}
+        photoStatus={photoStatus}
         onSetPhoto={handleSetPhoto}
       />
 

@@ -1,4 +1,4 @@
-import { http,httpAuth } from "./http";
+import { http, httpAuth, httpAuthFormData } from "./http";
 import { API_PATHS } from "../config/api";
 
 export const SessionsApi = {
@@ -27,14 +27,6 @@ export const SessionsApi = {
       body: JSON.stringify({ characterId }),
     });
   },
-
-  setSlotPhoto(sessionId, slotIndex, photoUrl) {
-    return http(`${API_PATHS.sessions}/${sessionId}/slots/${slotIndex}/photo`, {
-      method: "PATCH",
-      body: JSON.stringify({ photoUrl }),
-    });
-  },
-
   start(sessionId, mode) {
     return http(`${API_PATHS.sessions}/${sessionId}/start`, {
       method: "POST",
@@ -71,5 +63,18 @@ export const SessionsApi = {
     return http(`${API_PATHS.sessions}/${sessionId}/chat/clear`, {
       method: "POST",
     });
+  },
+  uploadSlotPhoto(sessionId, slotIndex, file) {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    return httpAuthFormData(
+      `${API_PATHS.sessions}/${sessionId}/slots/${slotIndex}/photo/upload`,
+      fd
+    );
+  },
+
+  getPhotoStatus(sessionId) {
+    return http(`${API_PATHS.sessions}/${sessionId}/photos/status`);
   },
 };

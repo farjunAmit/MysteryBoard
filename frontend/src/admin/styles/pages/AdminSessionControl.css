@@ -22,7 +22,7 @@
 .admin-session-control__content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3xl);
+  gap: var(--spacing-4xl);
 }
 
 .admin-session-control__error {
@@ -76,4 +76,8 @@
 .admin-session-control__end-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.admin-session-control__content > :nth-child(2) {
+  margin-top: var(--spacing-4xl);
 }

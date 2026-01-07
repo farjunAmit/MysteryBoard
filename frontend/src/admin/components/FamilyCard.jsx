@@ -5,6 +5,8 @@ export default function FamilyCard({
   family,
   slots,
   events,
+  sessionId,
+  photoStatus,
   onRevealTrait,
 }) {
   const familySlots = slots.filter((slot) => {
@@ -23,6 +25,7 @@ export default function FamilyCard({
           const character = (family.characters || []).find(
             (c) => String(c._id) === String(slot.characterId)
           );
+          const hasPhoto = photoStatus?.haveSlotIndexes?.includes(slot.slotIndex) ?? false;
           if (!character) return null;
 
           return (
@@ -31,6 +34,8 @@ export default function FamilyCard({
               character={character}
               slot={slot}
               events={events}
+              sessionId={sessionId}
+              hasPhoto={hasPhoto}
               onRevealTrait={onRevealTrait}
             />
           );

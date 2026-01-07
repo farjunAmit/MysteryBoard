@@ -27,6 +27,7 @@ export default function FamilyCard({
   family,
   characters,
   allCharacters,
+  sessionId,
   isRevealedAtIndex,
 }) {
   return (
@@ -42,6 +43,8 @@ export default function FamilyCard({
             <CharacterCard
               key={c.id}
               character={c}
+              sessionId={sessionId}
+              slotIndex={charIndex}
               isRevealed={isRevealedAtIndex(charIndex)}
             />
           );

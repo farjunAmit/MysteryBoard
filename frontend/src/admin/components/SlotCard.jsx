@@ -1,7 +1,11 @@
 import { texts as t } from "../../texts";
 import "../styles/components/SlotCard.css";
 
-export default function SlotCard({ slot, characterName, busy, onSetPhoto }) {
+export default function SlotCard({ slot, characterName, busy, hasPhoto, onSetPhoto, sessionId }) {
+  const photoUrl = sessionId && hasPhoto
+    ? `/api/sessions/${sessionId}/slots/${slot.slotIndex}/photo`
+    : null;
+
   return (
     <div className="slot-card">
       <div className="slot-card__row">
@@ -20,13 +24,19 @@ export default function SlotCard({ slot, characterName, busy, onSetPhoto }) {
         <strong className="slot-card__label">{t.admin.liveSession.slots.photo}:</strong>
         <div
           className={`slot-card__photo-status ${
-            slot.photoUrl ? "slot-card__photo-status--ok" : "slot-card__photo-status--missing"
+            hasPhoto ? "slot-card__photo-status--ok" : "slot-card__photo-status--missing"
           }`}
         >
-          {slot.photoUrl
+          {hasPhoto
             ? t.admin.liveSession.slots.photoOk
             : t.admin.liveSession.slots.photoMissing}
         </div>
+        
+        {photoUrl && (
+          <div className="slot-card__photo-preview">
+            <img src={photoUrl} alt={`Photo for slot ${slot.slotIndex}`} />
+          </div>
+        )}
       </div>
 
       <button

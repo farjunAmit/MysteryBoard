@@ -72,6 +72,7 @@ export default function ClientScreen() {
       </div>
 
       <CharactersGrid
+        sessionId={sessionId}
         characters={characters}
         families={families}
         scenarioMode={scenarioMode}

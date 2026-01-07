@@ -17,6 +17,8 @@ export default function CharactersList({
   slots = [],
   events = [],
   scenarioMode = "characters",
+  sessionId,
+  photoStatus,
   onRevealTrait,
 }) {
   if (!slots.length) {
@@ -31,6 +33,7 @@ export default function CharactersList({
           const character = characters.find(
             (c) => String(c._id) === String(slot.characterId)
           );
+          const hasPhoto = photoStatus?.haveSlotIndexes?.includes(slot.slotIndex) ?? false;
           if (!character) return null;
 
           return (
@@ -39,6 +42,8 @@ export default function CharactersList({
               character={character}
               slot={slot}
               events={events}
+              sessionId={sessionId}
+              hasPhoto={hasPhoto}
               onRevealTrait={onRevealTrait}
             />
           );
@@ -57,6 +62,8 @@ export default function CharactersList({
             family={group}
             slots={slots}
             events={events}
+            sessionId={sessionId}
+            photoStatus={photoStatus}
             onRevealTrait={onRevealTrait}
           />
         ))}

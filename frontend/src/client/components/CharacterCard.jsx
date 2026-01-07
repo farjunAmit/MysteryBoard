@@ -1,56 +1,112 @@
+import { useRef, useState } from "react";
 import { texts } from "../../texts";
+import { SessionsApi } from "../../api/sessions.api";
+import "../styles/components/CharacterCard.css";
 
-export default function CharacterCard({ character, isRevealed }) {
+export default function CharacterCard({
+  character,
+  isRevealed,
+  sessionId,
+  slotIndex,
+  isSetupPhase = false,
+  onPhotoUpload,
+}) {
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+
+  const photoUrl = sessionId && slotIndex !== undefined
+    ? `/api/sessions/${sessionId}/slots/${slotIndex}/photo`
+    : null;
+
+  const handlePhotoClick = () => {
+    if (isSetupPhase && !uploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !sessionId || slotIndex === undefined) return;
+
+    try {
+      setUploading(true);
+      setUploadError(null);
+      await SessionsApi.uploadSlotPhoto(sessionId, slotIndex, file);
+      onPhotoUpload?.();
+    } catch (err) {
+      setUploadError(err?.message || texts.client.characterCard.uploadError);
+      console.error("Photo upload failed:", err);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   return (
-    <div
-      style={{
-        width: "100%",
-        border: "1px solid #e5e7eb",
-        borderRadius: 12,
-        padding: 12,
-        background: "white",
-      }}
-    >
+    <div className="character-card">
       {/* Header */}
-      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <div className="character-card__header">
         {/* Avatar */}
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
-            background: "#f3f4f6",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 12,
-            color: "#6b7280",
-            flexShrink: 0,
-          }}
-        >
-          {isRevealed &&
-            (character.photoUrl ? (
-              <img
-                src={character.photoUrl}
-                alt={character.name}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        <div className="character-card__avatar-container">
+          <div
+            className="character-card__avatar"
+            onClick={handlePhotoClick}
+            style={{ cursor: isSetupPhase ? "pointer" : "default" }}
+          >
+            {isRevealed &&
+              (photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={character.name}
+                />
+              ) : (
+                <span>{texts.client.characterCard.noPhoto}</span>
+              ))}
+          </div>
+          {isSetupPhase && isRevealed && (
+            <>
+              <button
+                className="character-card__avatar-upload"
+                onClick={handlePhotoClick}
+                disabled={uploading}
+                title="Upload photo"
+              >
+                📷
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="character-card__avatar-input"
+                onChange={handleFileSelect}
               />
-            ) : (
-              <span>{texts.client.characterCard.noPhoto}</span>
-            ))}
+            </>
+          )}
         </div>
 
         {/* Name + hint */}
-        <div style={{ flex: 1 }}>
+        <div className="character-card__content">
           {isRevealed && (
             <>
-              <div style={{ fontWeight: 700, fontSize: 16 }}>
+              <h3 className="character-card__name">
                 {character.name}
-              </div>
+              </h3>
               {character.roleHint && (
-                <div style={{ fontSize: 13, color: "#6b7280" }}>
+                <p className="character-card__role-hint">
                   {character.roleHint}
+                </p>
+              )}
+              {uploading && (
+                <div className="character-card__upload-status">
+                  {texts.client.characterCard.uploading}
+                </div>
+              )}
+              {uploadError && (
+                <div className="character-card__upload-error">
+                  {uploadError}
                 </div>
               )}
             </>
@@ -62,10 +118,10 @@ export default function CharacterCard({ character, isRevealed }) {
       {isRevealed &&
         Array.isArray(character.traits) &&
         character.traits.length > 0 && (
-          <div style={{ marginTop: 10 }}>
-            <ul style={{ margin: 0, paddingInlineStart: 18 }}>
+          <div className="character-card__traits">
+            <ul className="character-card__traits-list">
               {character.traits.map((trait, idx) => (
-                <li key={idx} style={{ fontSize: 14, marginBottom: 4 }}>
+                <li key={idx} className="character-card__traits-item">
                   {trait}
                 </li>
               ))}

@@ -46,6 +46,25 @@
   color: var(--color-danger);
 }
 
+.slot-card__photo-preview {
+  width: 100%;
+  max-width: 150px;
+  height: 150px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-input);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.slot-card__photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .slot-card__button {
   padding: var(--spacing-lg) var(--spacing-xl);
   border-radius: var(--radius-lg);
