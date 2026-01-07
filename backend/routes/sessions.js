@@ -51,7 +51,6 @@ router.post("/", requireAuth, async (req, res) => {
     const slots = mandatory.map((c, idx) => ({
       slotIndex: idx,
       characterId: c._id,
-      photoUrl: null,
     }));
 
     const session = await GameSession.create({
@@ -227,7 +226,7 @@ router.post("/:id/end", async (req, res) => {
 
     session.phase = "ended";
     await session.save();
-
+    await SessionPhoto.deleteMany({ sessionId: id });
     return res.json(session);
   } catch (err) {
     console.error("End session error:", err);
@@ -273,9 +272,6 @@ router.post("/:id/slots", async (req, res) => {
     if (!char) {
       return res.status(400).json({ message: "characterId not in scenario" });
     }
-    if (!char) {
-      return res.status(400).json({ message: "characterId not in scenario" });
-    }
 
     // prevent duplicates
     const alreadyPicked = (session.slots || []).some(
@@ -296,7 +292,6 @@ router.post("/:id/slots", async (req, res) => {
     session.slots.push({
       slotIndex: nextIndex,
       characterId: char._id,
-      photoUrl: null,
     });
 
     session.playerCount = session.slots.length;
@@ -318,8 +313,11 @@ router.post(
     try {
       const { id, slotIndex } = req.params;
 
-      if (!req.file) {
-        return res.status(400).json({ message: "file is required" });
+      const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+      if (!allowedTypes.has(req.file.mimetype)) {
+        return res.status(400).json({
+          message: "Invalid file type. Only JPG/PNG/WEBP are allowed",
+        });
       }
 
       const session = await GameSession.findById(id);
@@ -349,9 +347,6 @@ router.post(
         },
         { upsert: true, new: true }
       );
-      slot.photoUrl = "uploaded";
-
-      await session.save();
       return res.json({ ok: true });
     } catch (err) {
       console.error("Upload photo error:", err);
@@ -423,56 +418,6 @@ router.post("/:id/start", async (req, res) => {
   }
 });
 
-// PATCH /api/sessions/:id/slots/:slotIndex/photo
-router.patch("/:id/slots/:slotIndex/photo", async (req, res) => {
-  try {
-    const { id, slotIndex } = req.params;
-    const { photoUrl } = req.body;
-
-    if (!photoUrl || typeof photoUrl !== "string" || !photoUrl.trim()) {
-      return res.status(400).json({
-        error: "INVALID_PHOTO_URL",
-        message: "photoUrl is required and must be a non-empty string",
-      });
-    }
-
-    const session = await GameSession.findById(id);
-    if (!session) {
-      return res
-        .status(404)
-        .json({ error: "NOT_FOUND", message: "Session not found" });
-    }
-
-    const phaseErr = assertPhase(session, ["setup"], res);
-    if (phaseErr) return;
-
-    const idx = Number(slotIndex);
-    if (!Number.isInteger(idx) || idx < 0) {
-      return res.status(400).json({
-        error: "INVALID_SLOT_INDEX",
-        message: "slotIndex must be a non-negative integer",
-      });
-    }
-
-    const slot = (session.slots || []).find((s) => s.slotIndex === idx);
-    if (!slot) {
-      return res.status(404).json({
-        error: "SLOT_NOT_FOUND",
-        message: `No slot with slotIndex=${idx} in this session`,
-      });
-    }
-
-    slot.photoUrl = photoUrl.trim();
-
-    await session.save();
-    return res.json(session);
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "SERVER_ERROR", message: err.message });
-  }
-});
-
 // DELETE /api/sessions/:id
 router.delete("/:id", async (req, res) => {
   try {
@@ -498,7 +443,7 @@ router.post("/:id/chat/clear", async (req, res) => {
 
     session.events.push({
       type: "chat_cleared",
-      text: "cleared", 
+      text: "cleared",
       characterId: null,
     });
 
@@ -527,6 +472,37 @@ router.get("/:id/slots/:slotIndex/photo", async (req, res) => {
     return res.send(photo.data);
   } catch (e) {
     return res.status(500).json({ message: "Failed to load photo" });
+  }
+});
+
+// GET /api/sessions/:id/photos/status
+router.get("/:id/photos/status", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await GameSession.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    const slotIndexes = (session.slots || []).map((s) => s.slotIndex);
+
+    const photos = await SessionPhoto.find(
+      { sessionId: id },
+      { slotIndex: 1, _id: 0 }
+    );
+
+    const have = photos.map((p) => p.slotIndex);
+    const haveSet = new Set(have);
+    const missing = slotIndexes.filter((idx) => !haveSet.has(idx));
+
+    return res.json({
+      totalSlots: slotIndexes.length,
+      haveCount: have.length,
+      haveSlotIndexes: have.sort((a, b) => a - b),
+      missingSlotIndexes: missing.sort((a, b) => a - b),
+      allPresent: slotIndexes.length > 0 && missing.length === 0,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to get photo status" });
   }
 });
 

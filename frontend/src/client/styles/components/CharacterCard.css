@@ -1,0 +1,114 @@
+/* Client Character Card */
+
+.character-card {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  background: var(--color-bg-card);
+  transition: all 0.2s ease;
+}
+
+.character-card__header {
+  display: flex;
+  gap: var(--spacing-2xl);
+  align-items: flex-start;
+}
+
+.character-card__avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.character-card__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-input);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.character-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.character-card__avatar-upload {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-bg-card);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.character-card__avatar-upload:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.character-card__avatar-upload:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.character-card__avatar-input {
+  display: none;
+}
+
+.character-card__content {
+  flex: 1;
+}
+
+.character-card__name {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.character-card__role-hint {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-sm) 0 0 0;
+}
+
+.character-card__traits {
+  margin-top: var(--spacing-xl);
+}
+
+.character-card__traits-list {
+  margin: 0;
+  padding-inline-start: 18px;
+  color: var(--color-text-primary);
+}
+
+.character-card__traits-item {
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.character-card__upload-status {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.character-card__upload-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  margin-top: var(--spacing-sm);
+}

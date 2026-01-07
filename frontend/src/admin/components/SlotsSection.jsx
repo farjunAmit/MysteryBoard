@@ -2,7 +2,7 @@ import SlotCard from "./SlotCard";
 import { texts as t } from "../../texts";
 import "../styles/components/SlotsSection.css";
 
-export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
+export default function SlotsSection({ session, scenario, busy, photoStatus, onSetPhoto }) {
   if (!session.slots || session.slots.length === 0) {
     return <p className="slots-section__empty-message">{t.admin.liveSession.states.noSlots}</p>;
   }
@@ -14,6 +14,7 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
           const charName =
             (scenario.characters || []).find((c) => String(c._id) === String(slot.characterId))?.name ||
             String(slot.characterId);
+          const hasPhoto = photoStatus?.haveSlotIndexes?.includes(slot.slotIndex) ?? false;
 
           return (
             <SlotCard
@@ -21,6 +22,8 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
               slot={slot}
               characterName={charName}
               busy={busy}
+              hasPhoto={hasPhoto}
+              sessionId={session.id || session._id}
               onSetPhoto={onSetPhoto}
             />
           );
@@ -52,6 +55,7 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
                   const charName =
                     groupChars.find((c) => String(c._id) === String(slot.characterId))?.name ||
                     String(slot.characterId);
+                  const hasPhoto = photoStatus?.haveSlotIndexes?.includes(slot.slotIndex) ?? false;
 
                   return (
                     <SlotCard
@@ -59,6 +63,8 @@ export default function SlotsSection({ session, scenario, busy, onSetPhoto }) {
                       slot={slot}
                       characterName={charName}
                       busy={busy}
+                      hasPhoto={hasPhoto}
+                      sessionId={session.id || session._id}
                       onSetPhoto={onSetPhoto}
                     />
                   );

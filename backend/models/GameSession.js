@@ -11,11 +11,6 @@ const SlotSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-
-    photoUrl: {
-      type: String,
-      default: null,
-    },
   },
   { _id: false }
 );

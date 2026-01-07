@@ -11,6 +11,7 @@ export default function AdminSessionControl() {
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [scenario, setScenario] = useState(null);
+  const [photoStatus, setPhotoStatus] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -26,6 +27,8 @@ export default function AdminSessionControl() {
         if (!cancelled) {
           setSession(data.session);
           setScenario(data.scenario);
+          const status = await SessionsApi.getPhotoStatus(data.session.id || data.session._id);
+          setPhotoStatus(status);
         }
       } catch (e) {
         if (!cancelled)
@@ -138,14 +141,18 @@ export default function AdminSessionControl() {
           slots={session.slots}
           events={session.events}
           scenarioMode={scenario.mode}
+          sessionId={session.id || session._id}
+          photoStatus={photoStatus}
           onRevealTrait={canRevealTraits ? handleRevealTrait : undefined}
         />
 
-        <SessionChat
-          disabled={session.phase !== "running"}
-          onSend={handleSendMessage}
-          onClear={handleClearMessage}
-        />
+        <div style={{ marginTop: "40px" }}>
+          <SessionChat
+            disabled={session.phase !== "running"}
+            onSend={handleSendMessage}
+            onClear={handleClearMessage}
+          />
+        </div>
       </div>
       {session.phase === "running" && (
         <button

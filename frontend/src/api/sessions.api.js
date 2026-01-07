@@ -73,4 +73,8 @@ export const SessionsApi = {
       fd
     );
   },
+
+  getPhotoStatus(sessionId) {
+    return http(`${API_PATHS.sessions}/${sessionId}/photos/status`);
+  },
 };

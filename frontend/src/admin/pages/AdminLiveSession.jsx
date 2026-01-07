@@ -19,6 +19,7 @@ export default function AdminLiveSession() {
   const [mode, setMode] = useState("slow");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [photoStatus, setPhotoStatus] = useState(null);
   const navigate = useNavigate();
   const sessionId = session?.id ?? session?._id;
 
@@ -31,6 +32,10 @@ export default function AdminLiveSession() {
         const data = await SessionsApi.getFullById(id);
         if (!cancelled) {
           setSession(data.session);
+          const status = await SessionsApi.getPhotoStatus(
+            data.session._id || data.session.id
+          );
+          setPhotoStatus(status);
           setScenario(data.scenario);
           setDesiredPlayers(data.session.playerCount);
         }
@@ -67,9 +72,7 @@ export default function AdminLiveSession() {
 
   const currentPlayers = session.slots?.length ?? 0;
   const canAddMore = currentPlayers < desiredPlayers;
-  const allPhotosPresent =
-    (session.slots || []).length > 0 &&
-    (session.slots || []).every((s) => Boolean(s.photoUrl));
+  const allPhotosPresent = Boolean(photoStatus?.allPresent);
 
   async function addOptional(characterId) {
     try {
@@ -111,8 +114,8 @@ export default function AdminLiveSession() {
         setBusy(true);
         setError("");
         await SessionsApi.uploadSlotPhoto(sessionId, slot.slotIndex, file);
-        const updated = await SessionsApi.getById(sessionId);
-        setSession(updated);
+        const status = await SessionsApi.getPhotoStatus(sessionId);
+        setPhotoStatus(status);
       } catch (err) {
         setError(err?.message || t.admin.liveSession.errors.savePhoto);
       } finally {
@@ -161,6 +164,7 @@ export default function AdminLiveSession() {
         session={session}
         scenario={scenario}
         busy={busy}
+        photoStatus={photoStatus}
         onSetPhoto={handleSetPhoto}
       />
 
