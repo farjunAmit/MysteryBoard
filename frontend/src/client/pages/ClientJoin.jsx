@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import AdminConnect from "../../admin/components/AdminConnect";
 import { ClientSessionsApi } from "../../api/clientSessions.api";
 import { texts as t } from "../../texts";
+import "../styles/client.css";
+import "../styles/pages/ClientJoin.css";
 
 export default function ClientJoin() {
   const [joinCode, setJoinCode] = useState("");
@@ -31,15 +33,15 @@ export default function ClientJoin() {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="client-join__container">
       <button 
         onClick={() => setShowAdminModal(true)} 
-        style={styles.adminButton}
+        className="client-join__admin-button"
       >
         Admin
       </button>
 
-      <h1>{t.client.join.title}</h1>
+      <h1 className="client-join__title">{t.client.join.title}</h1>
 
       <input
         type="text"
@@ -47,53 +49,16 @@ export default function ClientJoin() {
         value={joinCode}
         onChange={(e) => setJoinCode(e.target.value)}
         disabled={loading}
-        style={styles.input}
+        className="client-join__input"
       />
 
-      <button onClick={handleJoin} disabled={loading} style={styles.button}>
+      <button onClick={handleJoin} disabled={loading} className="client-join__button">
         {loading ? t.client.join.loadingButton : t.client.join.joinButton}
       </button>
 
-      {error && <div style={styles.error}>{error}</div>}
+      {error && <div className="client-join__error">{error}</div>}
 
       <AdminConnect isOpen={showAdminModal} onClose={() => setShowAdminModal(false)} />
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: 320,
-    margin: "80px auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    textAlign: "center",
-    position: "relative",
-  },
-  adminButton: {
-    position: "fixed",
-    top: "20px",
-    right: "20px",
-    padding: "10px 20px",
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  input: {
-    padding: 10,
-    fontSize: 16,
-  },
-  button: {
-    padding: 10,
-    fontSize: 16,
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: 14,
-  },
-};

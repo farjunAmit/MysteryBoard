@@ -1,0 +1,153 @@
+/* Admin Connect Modal */
+
+.admin-connect__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.admin-connect__modal {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-4xl);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.admin-connect__close {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  background: none;
+  border: none;
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.admin-connect__close:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+}
+
+.admin-connect__title {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-3xl);
+  text-align: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.admin-connect__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+}
+
+.admin-connect__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.admin-connect__form-group label {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.admin-connect__input {
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.admin-connect__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(201, 162, 77, 0.1);
+}
+
+.admin-connect__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.admin-connect__error {
+  color: var(--color-danger);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-md);
+  background-color: rgba(227, 91, 91, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
+.admin-connect__submit {
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  width: 100%;
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-black);
+  transition: all 0.2s ease;
+}
+
+.admin-connect__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.admin-connect__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-connect__toggle-container {
+  margin-top: var(--spacing-2xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.admin-connect__toggle-button {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.admin-connect__toggle-button:hover {
+  color: var(--color-primary-light);
+}

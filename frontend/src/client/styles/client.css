@@ -1,8 +1,6 @@
 @import "../../styles/variables.css";
 
-/* ============================================
-   GLOBAL STYLES
-   ============================================ */
+/* Client-specific global styles */
 * {
   box-sizing: border-box;
 }
