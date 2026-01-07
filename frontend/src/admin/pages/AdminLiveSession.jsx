@@ -21,7 +21,7 @@ export default function AdminLiveSession() {
   const [error, setError] = useState("");
   const [photoStatus, setPhotoStatus] = useState(null);
   const navigate = useNavigate();
-  const sessionId = session?.id ?? session?._id;
+  const sessionId = session?._id ?? session?.id;
 
   useEffect(() => {
     let cancelled = false;
