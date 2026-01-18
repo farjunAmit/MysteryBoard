@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { texts } from "../../texts";
 import { API_BASE_URL } from "../../config/api";
 import { SessionsApi } from "../../api/sessions.api";
-import "../styles/components/CharacterCard.css";
+import "../styles/components/ClientCharacterCardWantedBoard.css";
 
 export default function CharacterCard({
   character,

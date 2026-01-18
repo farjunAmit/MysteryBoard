@@ -1,0 +1,73 @@
+/* Client Screen - Wanted Board Background */
+
+.client-screen {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url(/src/img/wanted\ board.jpg);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  position: relative;
+  overflow: hidden;
+}
+
+.client-screen::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.client-screen > * {
+  position: relative;
+  z-index: 10;
+}
+
+.client-screen__header {
+  display: none;
+}
+
+.client-screen__message {
+  position: fixed;
+  bottom: 20px;
+  left: 60px;
+  width: 300px;
+  height: 280px;
+  background-image: url(/src/img/img\ temlet.png);
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.client-screen__message-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.client-screen__message-text {
+  flex: 1;
+  font-size: 14px;
+  color: #3c3c3c;
+  line-height: 1.4;
+  overflow-y: auto;
+  word-wrap: break-word;
+}

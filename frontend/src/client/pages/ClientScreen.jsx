@@ -4,7 +4,7 @@ import CharactersGrid from "../components/CharactersGrid";
 import { useClientSession } from "../hook/useClientSession";
 import { texts as t } from "../../texts";
 import { ClientSessionsApi } from "../../api/clientSessions.api";
-import "../styles/pages/ClientScreen.css";
+import "../styles/pages/ClientScreenWantedBoard.css";
 
 export default function ClientScreen() {
   const { sessionId } = useParams();
@@ -82,14 +82,16 @@ export default function ClientScreen() {
         isRevealedAtIndex={isRevealedAtIndex}
       />
 
-      {latestChat && (
-        <div className="client-screen__message">
-          <div className="client-screen__message-label">
-            {t.client.screen.message || "Message"}
-          </div>
-          <div className="client-screen__message-text">{latestChat.text}</div>
-        </div>
-      )}
+      <div className="client-screen__message">
+        {latestChat && (
+          <>
+            <div className="client-screen__message-label">
+              {t.client.screen.message || "Message"}
+            </div>
+            <div className="client-screen__message-text">{latestChat.text}</div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

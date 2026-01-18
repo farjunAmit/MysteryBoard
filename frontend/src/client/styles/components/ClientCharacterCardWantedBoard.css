@@ -1,0 +1,159 @@
+/* Client Character Card - Wanted Board Template */
+/* Use scoped selector to avoid conflicts with admin styles */
+
+.client-screen .character-card {
+  flex: 1 1 220px;
+  max-width: 300px;
+  min-width: 200px;
+  background-image: url(/src/img/img\ temlet.png);
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 12px;
+  overflow: visible;
+  box-shadow: none;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  max-height: 350px;
+  position: relative;
+}
+
+.client-screen .character-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  border-radius: 0;
+}
+
+.client-screen .character-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  margin-top: 15px;
+}
+
+.client-screen .character-card__avatar-container {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 200px;
+  min-height: 0;
+}
+
+.client-screen .character-card__avatar {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+  background: transparent;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  border: none;
+  box-shadow: none;
+  min-height: 0;
+}
+
+.client-screen .character-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 3px solid #8b7355;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.client-screen .character-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.client-screen .character-card__avatar-upload {
+  display: none;
+}
+
+.client-screen .character-card__avatar-upload:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.client-screen .character-card__avatar-input {
+  display: none;
+}
+
+.client-screen .character-card__content {
+  flex: 1;
+  padding: 15px 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.client-screen .character-card__name {
+  font-weight: var(--font-weight-black);
+  font-size: var(--font-size-lg);
+  color: #2c2c2c;
+  margin: 0;
+  text-align: center;
+  border-bottom: 2px solid #8b7355;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.client-screen .character-card__role-hint {
+  display: none;
+}
+
+.client-screen .character-card__traits {
+  margin-top: 0;
+  width: 100%;
+}
+
+.client-screen .character-card__traits-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #3c3c3c;
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.client-screen .character-card__traits-item {
+  font-size: 12px;
+  margin-bottom: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+}
+
+.client-screen .character-card__traits-item:last-child {
+  border-bottom: none;
+}
+
+.client-screen .character-card__upload-status {
+  display: none;
+}
+
+.client-screen .character-card__upload-error {
+  display: none;
+}

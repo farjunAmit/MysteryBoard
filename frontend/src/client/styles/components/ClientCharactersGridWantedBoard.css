@@ -1,0 +1,61 @@
+/* Client Characters Grid - Scattered Wanted Board Layout */
+
+.characters-grid {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 5vh 20px 5vh 20px;
+  height: 100vh;
+  overflow: hidden;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+/* Fixed rotation angles for each card */
+.characters-grid > :nth-child(1) {
+  transform: rotate(-12deg);
+}
+
+.characters-grid > :nth-child(2) {
+  transform: rotate(8deg);
+}
+
+.characters-grid > :nth-child(3) {
+  transform: rotate(-6deg);
+}
+
+.characters-grid > :nth-child(4) {
+  transform: rotate(15deg);
+}
+
+.characters-grid > :nth-child(5) {
+  transform: rotate(-9deg);
+}
+
+.characters-grid > :nth-child(6) {
+  transform: rotate(4deg);
+}
+
+.characters-grid > :nth-child(7) {
+  transform: rotate(-14deg);
+}
+
+.characters-grid > :nth-child(8) {
+  transform: rotate(11deg);
+}
+
+.characters-grid > :nth-child(9) {
+  transform: rotate(-5deg);
+}
+
+.characters-grid > :nth-child(10) {
+  transform: rotate(13deg);
+}
+
+.characters-grid > :nth-child(n+11) {
+  transform: rotate(-10deg);
+}

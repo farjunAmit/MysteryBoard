@@ -1,6 +1,6 @@
 import CharacterCard from "./CharacterCard";
 import FamilyCard from "./FamilyCard";
-import "../styles/components/CharactersGrid.css";
+import "../styles/components/ClientCharactersGridWantedBoard.css";
 
 export default function CharactersGrid({
   sessionId,

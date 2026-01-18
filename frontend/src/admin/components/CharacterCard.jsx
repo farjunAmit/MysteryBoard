@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { texts as t } from "../../texts";
 import { API_BASE_URL } from "../../config/api";
-import "../styles/components/CharacterCard.css";
+import "../styles/components/AdminCharacterCard.css";
 
 function getRevealedTraitsForCharacter(events, characterId) {
   return (events || [])
