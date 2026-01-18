@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminHome from "./admin/pages/AdminHome";
 import AdminLiveSession from "./admin/pages/AdminLiveSession";
 import AdminSessionControl from "./admin/pages/AdminSessionControl";

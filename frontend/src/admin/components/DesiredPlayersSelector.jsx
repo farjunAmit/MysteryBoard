@@ -8,7 +8,7 @@ export default function DesiredPlayersSelector({
   optionalCharsCount,
   currentPlayers,
 }) {
-  const maxPlayers = mandatoryCharsCount + optionalCharsCount;
+ // const maxPlayers = mandatoryCharsCount + optionalCharsCount;
 
   return (
     <div className="desired-players-selector">
