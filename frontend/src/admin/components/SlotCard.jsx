@@ -35,7 +35,7 @@ export default function SlotCard({ slot, characterName, busy, hasPhoto, onSetPho
         
         {photoUrl && (
           <div className="slot-card__photo-preview">
-            <img src={photoUrl} alt={`Photo for slot ${slot.slotIndex}`} />
+            <img src={photoUrl} alt={` slot ${slot.slotIndex}`} />
           </div>
         )}
       </div>

@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.53a8eb76.css",
+    "main.js": "/static/js/main.4e12de5c.js",
+    "static/js/453.d7446e4a.chunk.js": "/static/js/453.d7446e4a.chunk.js",
+    "static/media/wanted board.jpg": "/static/media/wanted board.afa35cd0c7f98093720d.jpg",
+    "static/media/img temlet.png": "/static/media/img temlet.0e3b536315bf4c062e11.png",
+    "index.html": "/index.html",
+    "main.53a8eb76.css.map": "/static/css/main.53a8eb76.css.map",
+    "main.4e12de5c.js.map": "/static/js/main.4e12de5c.js.map",
+    "453.d7446e4a.chunk.js.map": "/static/js/453.d7446e4a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.53a8eb76.css",
+    "static/js/main.4e12de5c.js"
+  ]
+}
